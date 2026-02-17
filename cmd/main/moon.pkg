@@ -1,0 +1,7 @@
+// import {
+//   "ryota0624/googleauth" @lib,
+// }
+
+options(
+  "is-main": true,
+)
