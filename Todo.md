@@ -1,0 +1,186 @@
+# Goal
+
+google API用の認証情報を取得するための実装
+
+# Todos
+
+## 調査フェーズ（完了）
+
+- [x] google API用の認証情報を取得するための実装をするための調査
+ - [x] 参考にするライブラリの決定
+ - [x] 必要な機能の洗い出し
+ - [x] 実装順序の検討
+ - [x] 結合動作検証方法の検討
+
+**成果物:**
+- `docs/investigation.md` - 調査レポート
+- `docs/features.md` - 機能仕様書
+- `docs/implementation_plan.md` - 実装計画
+- `docs/testing_strategy.md` - テスト戦略
+- `docs/README.md` - ドキュメントサマリー
+
+## 計画見直し: ryota0624/oauth2ライブラリを活用
+
+**重要な決定:** 既存のMoonBit OAuth2ライブラリ（`ryota0624/oauth2`）を使用することで、実装期間を**2-3週間 → 3-5日**に短縮できます。
+
+詳細: `docs/revised_plan_with_oauth2_lib.md`
+
+### 環境セットアップ（完了）
+- [x] ryota0624/oauth2ライブラリの依存関係を追加
+- [ ] Google Cloud Consoleでテスト用プロジェクト作成
+
+### Phase 1: Google OAuth2 ラッパー実装（推定: 1-2日）
+
+#### Google定数定義（2-3時間）
+- [ ] lib/google_constants.mbt 作成
+  - [ ] Google認証エンドポイント定義
+  - [ ] 一般的なスコープ定数定義（Drive, Gmail, Calendar等）
+  - [ ] ユニットテスト
+
+#### GoogleOAuth2Client ラッパー（3-4時間）
+- [ ] lib/google_client.mbt 作成
+  - [ ] GoogleOAuth2Client構造体
+  - [ ] build_auth_url() メソッド
+  - [ ] exchange_code() メソッド
+  - [ ] ユニットテスト
+
+#### ヘルパー関数（2-3時間）
+- [ ] lib/google_helpers.mbt 作成
+  - [ ] parse_callback_url() - リダイレクトURLパース
+  - [ ] PkceStorage trait定義
+  - [ ] ユニットテスト
+
+#### 統合とテスト（3-4時間）
+- [ ] examples/basic_auth/ サンプル作成
+- [ ] 実際のGoogle OAuth2で動作確認
+- [ ] E2Eテスト手順書作成
+
+### Phase 1.5: Server-to-Server認証（推定: 1.5-2.5日）⚠️ **工数見直し**
+
+詳細:
+- `docs/server_to_server_auth.md`
+- `docs/application_default_credentials.md` ⭐ **NEW**
+
+#### 1. Client Credentials Flow ラッパー（2-3時間）
+- [ ] lib/google_client_credentials.mbt 作成
+  - [ ] GoogleClientCredentials構造体
+  - [ ] get_access_token() メソッド（既存ライブラリのラッパー）
+  - [ ] ユニットテスト
+  - [ ] 実通信テスト
+
+**注:** Client Credentials Flow自体は `ryota0624/oauth2` で既に実装済み。Google特有のラッパーのみ実装。
+
+#### 2. Application Default Credentials (ADC)（3-5時間）⭐ **NEW - 優先度高**
+
+**重要:** プロダクション環境では必須の機能
+
+- [ ] lib/service_account/adc.mbt 作成
+  - [ ] load_credentials_from_env() 実装
+    - [ ] GOOGLE_APPLICATION_CREDENTIALS環境変数読み取り
+    - [ ] ファイルパス取得
+  - [ ] ServiceAccountCredentials型定義
+  - [ ] parse_service_account_key() 実装
+    - [ ] JSON keyファイルパース
+    - [ ] 必須フィールド検証
+  - [ ] AdcError型定義
+  - [ ] ユニットテスト
+    - [ ] 環境変数が設定されている場合
+    - [ ] 環境変数が未設定の場合
+    - [ ] JSONパース成功/失敗
+
+#### 3. Metadata Server認証（3-4時間）⭐ **NEW - 優先度高**
+
+**重要:** GCE/GKE/Cloud Run環境では必須の機能
+
+- [ ] lib/service_account/metadata.mbt 作成
+  - [ ] MetadataServerConfig型定義
+  - [ ] get_token_from_metadata_server() 実装
+    - [ ] HTTPリクエスト（Metadata-Flavor: Google ヘッダー）
+    - [ ] エンドポイント: http://metadata.google.internal/computeMetadata/v1/...
+    - [ ] レスポンスパース
+  - [ ] is_metadata_server_available() 実装
+    - [ ] タイムアウト付きチェック（1秒）
+  - [ ] MetadataTokenResponse型定義
+  - [ ] MetadataError型定義
+  - [ ] ユニットテスト
+  - [ ] 統合テスト（Cloud Run/GCE環境）
+
+#### 4. 自動認証検出（3-5時間）⭐ **NEW - 優先度高**
+
+**重要:** 環境に応じて自動的に最適な認証方法を選択
+
+- [ ] lib/google_auth_client.mbt 作成
+  - [ ] GoogleAuthClient型定義
+  - [ ] AuthCredentials enum定義
+  - [ ] auto_detect_and_authenticate() 実装
+    - [ ] Step 1: 明示的な認証情報チェック
+    - [ ] Step 2: ADC (環境変数) チェック
+    - [ ] Step 3: Metadata Server チェック
+    - [ ] Step 4: エラー（すべて失敗）
+  - [ ] get_access_token() 実装
+  - [ ] ユニットテスト
+  - [ ] E2Eテスト（複数環境）
+    - [ ] ローカル環境（ADC）
+    - [ ] GCE環境（Metadata Server）
+    - [ ] Cloud Run環境（Metadata Server）
+
+#### 5. RSA暗号化ライブラリ調査（1時間）
+- [ ] mooncakes.ioで暗号化/RSAライブラリ検索
+- [ ] 既存ライブラリの評価
+- [ ] Service Account JWT実装可能性の判断
+
+#### 6. Service Account JWT実装（条件付き: 4-6時間）
+**条件:** RSA署名ライブラリが利用可能な場合のみ実装
+**優先度:** 中（ADC/Metadataがあれば代替可能）
+
+- [ ] lib/service_account/jwt.mbt 作成
+  - [ ] JwtHeader, ServiceAccountClaims型定義
+  - [ ] JWT文字列生成
+- [ ] lib/service_account/signer.mbt 作成
+  - [ ] Rs256Signer実装（または既存ライブラリ統合）
+- [ ] lib/service_account/auth.mbt 作成
+  - [ ] ServiceAccountAuth構造体
+  - [ ] get_access_token() メソッド
+- [ ] 統合テスト
+- [ ] ドキュメント
+
+**注:** ADCとMetadata Serverがあれば、Service Account JWT実装がなくても本番環境で動作可能
+
+### Phase 2: 高度な機能（推定: 0.5-1日）
+
+#### トークン管理（2-3時間）
+- [ ] lib/token_manager.mbt 作成
+  - [ ] TokenManager構造体
+  - [ ] is_expired() メソッド
+  - [ ] needs_refresh() メソッド
+  - [ ] ユニットテスト
+
+#### トークンストレージ（2-3時間）
+- [ ] lib/token_storage.mbt 作成
+  - [ ] TokenStorage trait
+  - [ ] FileTokenStorage実装例
+  - [ ] ユニットテスト
+
+#### 高レベルAPI（2-3時間）
+- [ ] lib/google_api_client.mbt 作成
+  - [ ] GoogleApiClient構造体
+  - [ ] 自動トークンリフレッシュ機能
+  - [ ] ユニットテスト
+
+### ドキュメント整備（推定: 0.5-1日）
+- [ ] README.md更新
+  - [ ] プロジェクト概要
+  - [ ] インストール方法
+  - [ ] クイックスタート
+  - [ ] 基本的な使用例
+- [ ] docs/quickstart.md作成
+- [ ] docs/api_reference.md作成
+- [ ] docs/google_setup.md作成（Google Console設定手順）
+- [ ] examples/の充実
+
+### Phase 3（オプション）: OpenID Connect完全対応（1-2日）
+- [ ] ID Token署名検証
+- [ ] Google UserInfo endpoint統合
+- [ ] email_verified等のクレーム検証
+
+注: ryota0624/oauth2に既に基本実装があるため、必要に応じて拡張
