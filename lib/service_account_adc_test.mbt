@@ -1,9 +1,15 @@
 ///|
 /// Application Default Credentials のテスト
 test "parse_service_account_key with valid JSON" {
-  let json = "{\"type\": \"service_account\", \"project_id\": \"test\", \"client_email\": \"test@test.iam.gserviceaccount.com\", \"private_key\": \"-----BEGIN PRIVATE KEY-----\\ntest\\n-----END PRIVATE KEY-----\\n\"}"
+  let json = "{\"type\": \"service_account\", \"project_id\": \"test\", \"private_key_id\": \"key-id\", \"private_key\": \"-----BEGIN PRIVATE KEY-----\\ntest\\n-----END PRIVATE KEY-----\\n\", \"client_email\": \"test@test.iam.gserviceaccount.com\", \"client_id\": \"123456789\", \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\", \"token_uri\": \"https://oauth2.googleapis.com/token\"}"
   match parse_service_account_key(json) {
-    Ok(_) => assert_true(true)
+    Ok(creds) => {
+      assert_eq(creds.type_, "service_account")
+      assert_eq(creds.project_id, "test")
+      assert_eq(creds.private_key_id, "key-id")
+      assert_eq(creds.client_email, "test@test.iam.gserviceaccount.com")
+      assert_eq(creds.client_id, "123456789")
+    }
     Err(_) => assert_false(true)
   }
 }
@@ -18,7 +24,7 @@ test "parse_service_account_key with empty JSON" {
 
 ///|
 test "parse_service_account_key missing type field" {
-  let json = "{\"project_id\": \"test\", \"client_email\": \"test@test.iam.gserviceaccount.com\", \"private_key\": \"-----BEGIN PRIVATE KEY-----\\ntest\\n-----END PRIVATE KEY-----\\n\"}"
+  let json = "{\"project_id\": \"test\", \"private_key_id\": \"key-id\", \"client_email\": \"test@test.iam.gserviceaccount.com\", \"private_key\": \"-----BEGIN PRIVATE KEY-----\\ntest\\n-----END PRIVATE KEY-----\\n\", \"client_id\": \"123456789\", \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\", \"token_uri\": \"https://oauth2.googleapis.com/token\"}"
   match parse_service_account_key(json) {
     Ok(_) => assert_false(true)
     Err(_) => assert_true(true)
@@ -27,7 +33,7 @@ test "parse_service_account_key missing type field" {
 
 ///|
 test "parse_service_account_key missing project_id field" {
-  let json = "{\"type\": \"service_account\", \"client_email\": \"test@test.iam.gserviceaccount.com\", \"private_key\": \"-----BEGIN PRIVATE KEY-----\\ntest\\n-----END PRIVATE KEY-----\\n\"}"
+  let json = "{\"type\": \"service_account\", \"private_key_id\": \"key-id\", \"client_email\": \"test@test.iam.gserviceaccount.com\", \"private_key\": \"-----BEGIN PRIVATE KEY-----\\ntest\\n-----END PRIVATE KEY-----\\n\", \"client_id\": \"123456789\", \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\", \"token_uri\": \"https://oauth2.googleapis.com/token\"}"
   match parse_service_account_key(json) {
     Ok(_) => assert_false(true)
     Err(_) => assert_true(true)
@@ -36,7 +42,7 @@ test "parse_service_account_key missing project_id field" {
 
 ///|
 test "parse_service_account_key missing client_email field" {
-  let json = "{\"type\": \"service_account\", \"project_id\": \"test\", \"private_key\": \"-----BEGIN PRIVATE KEY-----\\ntest\\n-----END PRIVATE KEY-----\\n\"}"
+  let json = "{\"type\": \"service_account\", \"project_id\": \"test\", \"private_key_id\": \"key-id\", \"private_key\": \"-----BEGIN PRIVATE KEY-----\\ntest\\n-----END PRIVATE KEY-----\\n\", \"client_id\": \"123456789\", \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\", \"token_uri\": \"https://oauth2.googleapis.com/token\"}"
   match parse_service_account_key(json) {
     Ok(_) => assert_false(true)
     Err(_) => assert_true(true)
@@ -45,7 +51,7 @@ test "parse_service_account_key missing client_email field" {
 
 ///|
 test "parse_service_account_key missing private_key field" {
-  let json = "{\"type\": \"service_account\", \"project_id\": \"test\", \"client_email\": \"test@test.iam.gserviceaccount.com\"}"
+  let json = "{\"type\": \"service_account\", \"project_id\": \"test\", \"private_key_id\": \"key-id\", \"client_email\": \"test@test.iam.gserviceaccount.com\", \"client_id\": \"123456789\", \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\", \"token_uri\": \"https://oauth2.googleapis.com/token\"}"
   match parse_service_account_key(json) {
     Ok(_) => assert_false(true)
     Err(_) => assert_true(true)

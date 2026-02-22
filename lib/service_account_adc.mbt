@@ -15,14 +15,14 @@
 /// - 成功: ServiceAccountCredentials
 /// - 失敗: AdcError
 ///
-/// 注: Phase 1.5ではファイルI/Oが完全実装されていないため、
-/// JSONの直接指定版 (parse_service_account_key) の使用を推奨
+/// Note: Phase 3で実装予定。現在はスタブ実装。
+/// 実装には以下が必要:
+/// - 環境変数アクセスライブラリの統合
 pub fn load_credentials_from_env() -> Result[
   ServiceAccountCredentials,
   AdcError,
 ] {
-  // Phase 1.5では環境変数取得未実装
-  // Phase 2以降で完全実装を予定
+  // TODO: Phase 3で環境変数アクセス実装時に修正
   Err(EnvironmentVariableNotSet)
 }
 
@@ -35,13 +35,18 @@ pub fn load_credentials_from_env() -> Result[
 /// Returns:
 /// - 成功: ServiceAccountCredentials
 /// - 失敗: AdcError
+///
+/// Note: Phase 3で実装予定。現在はスタブ実装。
+/// 実装には以下が必要:
+/// - ファイルI/Oライブラリの統合
+/// - 非同期処理への対応（またはブロッキング呼び出し）
 pub fn load_credentials_from_file(
   file_path : String,
 ) -> Result[ServiceAccountCredentials, AdcError] {
-  // ファイルを読み込み
-  // 注: MoonBitでファイルI/Oを行うには、適切なファイルI/Oライブラリが必要
-  // Phase 1.5では簡略実装を行い、Phase 2以降で完全実装を予定
-  Err(IoCCError("File I/O not implemented in Phase 1.5"))
+  // TODO: Phase 3でファイルI/O実装時に修正
+  // 現在: JSONの直接指定版 (parse_service_account_key) の使用を推奨
+  let _ = file_path
+  Err(IoCCError("File I/O not yet implemented"))
 }
 
 ///|
@@ -56,48 +61,93 @@ pub fn load_credentials_from_file(
 pub fn parse_service_account_key(
   json_str : String,
 ) -> Result[ServiceAccountCredentials, AdcError] {
-  // JSON文字列をパース（簡略版）
-  // 実装ではMoonBitのビルトインJSON機能を使用
-  // ここではモック実装
-
   if json_str.is_empty() {
     return Err(InvalidJson("Empty JSON string"))
   }
 
-  // 必須フィールドの確認
-  if !json_str.contains("\"type\"") {
-    return Err(MissingField("type"))
+  // JSON文字列をパース
+  let json = @json.parse(json_str) catch {
+    _e => return Err(InvalidJson("Failed to parse JSON"))
   }
 
-  if !json_str.contains("\"project_id\"") {
-    return Err(MissingField("project_id"))
+  // JSONオブジェクトとして処理
+  let obj = match json {
+    Object(o) => o
+    _ => return Err(InvalidJson("Not a JSON object"))
   }
 
-  if !json_str.contains("\"client_email\"") {
-    return Err(MissingField("client_email"))
+  // 必須フィールド抽出: type
+  let type_ = match obj.get("type") {
+    Some(String(s)) => s
+    _ => return Err(MissingField("type"))
   }
 
-  if !json_str.contains("\"private_key\"") {
-    return Err(MissingField("private_key"))
+  // 必須フィールド抽出: project_id
+  let project_id = match obj.get("project_id") {
+    Some(String(s)) => s
+    _ => return Err(MissingField("project_id"))
   }
 
-  // 簡略化: 有効な JSON として見なされたら成功
-  // 実装ではJSON.parse()を使用してもっと詳細にパース
+  // 必須フィールド抽出: private_key_id
+  let private_key_id = match obj.get("private_key_id") {
+    Some(String(s)) => s
+    _ => return Err(MissingField("private_key_id"))
+  }
+
+  // 必須フィールド抽出: private_key
+  let private_key = match obj.get("private_key") {
+    Some(String(s)) => s
+    _ => return Err(MissingField("private_key"))
+  }
+
+  // 必須フィールド抽出: client_email
+  let client_email = match obj.get("client_email") {
+    Some(String(s)) => s
+    _ => return Err(MissingField("client_email"))
+  }
+
+  // 必須フィールド抽出: client_id
+  let client_id = match obj.get("client_id") {
+    Some(String(s)) => s
+    _ => return Err(MissingField("client_id"))
+  }
+
+  // 必須フィールド抽出: auth_uri
+  let auth_uri = match obj.get("auth_uri") {
+    Some(String(s)) => s
+    _ => return Err(MissingField("auth_uri"))
+  }
+
+  // 必須フィールド抽出: token_uri
+  let token_uri = match obj.get("token_uri") {
+    Some(String(s)) => s
+    _ => return Err(MissingField("token_uri"))
+  }
+
+  // オプションフィールド抽出: auth_provider_x509_cert_url
+  let auth_provider_x509_cert_url = match
+    obj.get("auth_provider_x509_cert_url") {
+    Some(String(s)) => Some(s)
+    _ => None
+  }
+
+  // オプションフィールド抽出: client_x509_cert_url
+  let client_x509_cert_url = match obj.get("client_x509_cert_url") {
+    Some(String(s)) => Some(s)
+    _ => None
+  }
+
   Ok(ServiceAccountCredentials::{
-    type_: "service_account",
-    project_id: "test-project",
-    private_key_id: "test-key-id",
-    private_key: "-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----\n",
-    client_email: "test@test.iam.gserviceaccount.com",
-    client_id: "123456789",
-    auth_uri: "https://accounts.google.com/o/oauth2/auth",
-    token_uri: "https://oauth2.googleapis.com/token",
-    auth_provider_x509_cert_url: Some(
-      "https://www.googleapis.com/oauth2/v1/certs",
-    ),
-    client_x509_cert_url: Some(
-      "https://www.googleapis.com/robot/v1/metadata/x509/test%40test.iam.gserviceaccount.com",
-    ),
+    type_,
+    project_id,
+    private_key_id,
+    private_key,
+    client_email,
+    client_id,
+    auth_uri,
+    token_uri,
+    auth_provider_x509_cert_url,
+    client_x509_cert_url,
   })
 }
 

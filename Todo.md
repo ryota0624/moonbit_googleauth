@@ -212,26 +212,28 @@ Future consideration in Phase 2 when RSA library stabilizes
   - 優先度: 高（Phase 2.5対象）
 
 ### service_account_adc.mbt
-- [ ] **環境変数からの認証情報読み込み**（現在: NotSet エラー返却）
+- [x] **環境変数からの認証情報読み込み**（現在: スタブ実装）
   - Location: Line 20-26
-  - 機能: `load_credentials_from_env()` - GOOGLE_APPLICATION_CREDENTIALS 環境変数対応
+  - 機能: `load_credentials_from_env()` - ライブラリ統合待ち
   - 依存: 環境変数アクセス機能
-  - 優先度: 高（実運用必須）
+  - 優先度: 高（実運用必須・Phase 3）
+  - ステータス: スタブ完成（ログイン: 20260222）
 
 - [ ] **ファイルからの認証情報読み込み**（現在: IoCCError 返却）
   - Location: Line 38-44
   - 機能: `load_credentials_from_file()` - JSONファイルの読み込みと解析
-  - 依存: ファイルI/O機能
-  - 優先度: 高（実運用必須）
+  - 依存: ファイルI/O機能（非同期）
+  - 優先度: 高（実運用必須・Phase 3）
 
-- [ ] **JSON パース詳細化**（現在: モック実装）
-  - Location: Line 94 コメント参照
-  - 目的: JSON.parse() を使用した完全パース
+- [x] **JSON パース詳細化**（完了: @json.parse() 実装）
+  - Location: Line 61
+  - 目的: JSON.parse() を使用した完全パース ✅
   - 含まれるフィール:
     - type, project_id, private_key_id, private_key
     - client_email, client_id, auth_uri, token_uri
     - auth_provider_x509_cert_url, client_x509_cert_url
   - 優先度: 中
+  - ステータス: 完了（ログイン: 20260222）
 
 ### service_account_metadata.mbt
 - [ ] **Metadata Server 有効性確認の実装**（現在: false 固定返却）
@@ -267,10 +269,11 @@ Future consideration in Phase 2 when RSA library stabilizes
   - 機能: ファイルベースのトークン永続化
   - 実装内容:
     - TokenManager の JSON シリアライゼーション
-    - ファイル書込・読込
+    - ファイル書込・読込（非同期）
     - 暗号化検討（オプション）
-  - 依存: ファイルI/O、JSON パース
-  - 優先度: 高（実運用向け）
+  - 依存: ファイルI/O（非同期）、JSON パース
+  - 優先度: 高（実運用向け・Phase 3）
+  - ステータス: スタブ状態維持（非同期ファイルI/O待ち）
 
 ### google_api_client.mbt
 - [ ] **レスポンスメタデータからの expires_in 抽出**（現在: 固定値 3600秒）

@@ -63,7 +63,10 @@ pub fn new_file_storage(file_path : String) -> FileTokenStorage {
 }
 
 ///|
-/// Save token to file storage (stub - Phase 2)
+/// Save token to file storage (stub - Phase 3)
+///
+/// Note: Full implementation requires file I/O and async support.
+/// Currently returns error to maintain API compatibility.
 pub fn FileTokenStorage::save(
   _self : FileTokenStorage,
   _token : TokenManager,
@@ -76,7 +79,10 @@ pub fn FileTokenStorage::save(
 }
 
 ///|
-/// Load token from file storage (stub - Phase 2)
+/// Load token from file storage (stub - Phase 3)
+///
+/// Note: Full implementation requires file I/O and async support.
+/// Currently returns error to maintain API compatibility.
 pub fn FileTokenStorage::load(
   _self : FileTokenStorage,
 ) -> Result[TokenManager, TokenStorageError] {
@@ -88,7 +94,10 @@ pub fn FileTokenStorage::load(
 }
 
 ///|
-/// Clear token from file storage (stub - Phase 2)
+/// Clear token from file storage (stub - Phase 3)
+///
+/// Note: Full implementation requires file I/O and async support.
+/// Currently returns error to maintain API compatibility.
 pub fn FileTokenStorage::clear(
   _self : FileTokenStorage,
 ) -> Result[Unit, TokenStorageError] {
