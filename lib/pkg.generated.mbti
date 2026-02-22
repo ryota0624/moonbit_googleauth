@@ -18,13 +18,21 @@ pub fn default_metadata_server_config() -> MetadataServerConfig
 
 pub fn drive_scopes() -> Array[@oauth2.Scope]
 
+pub fn from_service_account_credentials(ServiceAccountCredentials) -> GoogleClientCredentials
+
 pub fn get_access_token(GoogleAuthClient) -> Result[String, AuthenticationError]
 
 pub fn get_access_token_from_metadata_server() -> Result[String, MetadataError]
 
+pub fn get_access_token_with_scopes(GoogleClientCredentials, Array[String]) -> Result[String, ClientCredentialsError]
+
+pub fn get_token_from_client_credentials(GoogleClientCredentials) -> Result[String, ClientCredentialsError]
+
 pub fn get_token_from_metadata_server(MetadataServerConfig) -> Result[MetadataTokenResponse, MetadataError]
 
 pub fn gmail_scopes() -> Array[@oauth2.Scope]
+
+pub fn is_credentials_valid(GoogleClientCredentials) -> Bool
 
 pub fn is_metadata_server_available() -> Bool
 
@@ -120,6 +128,14 @@ pub enum ClientCredentialsError {
 pub struct GoogleAuthClient {
   auth_type : AuthCredentialsType
   credentials : ServiceAccountCredentials?
+}
+
+pub struct GoogleClientCredentials {
+  service_account_email : String
+  project_id : String
+  client_id : String
+  token_uri : String
+  private_key : String
 }
 
 pub struct GoogleOAuth2Client {

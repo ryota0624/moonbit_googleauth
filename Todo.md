@@ -63,11 +63,11 @@ google API用の認証情報を取得するための実装
 - `docs/application_default_credentials.md` ⭐ **NEW**
 
 #### 1. Client Credentials Flow ラッパー（2-3時間）
-- [ ] lib/google_client_credentials.mbt 作成
-  - [ ] GoogleClientCredentials構造体
-  - [ ] get_access_token() メソッド（既存ライブラリのラッパー）
-  - [ ] ユニットテスト
-  - [ ] 実通信テスト
+- [x] lib/google_client_credentials.mbt 作成
+  - [x] GoogleClientCredentials構造体
+  - [x] get_token_from_client_credentials() メソッド（既存ライブラリのラッパー）
+  - [x] ユニットテスト
+  - [ ] 実通信テスト（Phase 2対象）
 
 **注:** Client Credentials Flow自体は `ryota0624/oauth2` で既に実装済み。Google特有のラッパーのみ実装。
 
