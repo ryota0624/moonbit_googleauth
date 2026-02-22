@@ -75,19 +75,22 @@ google API用の認証情報を取得するための実装
 
 **重要:** プロダクション環境では必須の機能
 
-- [ ] lib/service_account/adc.mbt 作成
-  - [ ] load_credentials_from_env() 実装
-    - [ ] GOOGLE_APPLICATION_CREDENTIALS環境変数読み取り
-    - [ ] ファイルパス取得
-  - [ ] ServiceAccountCredentials型定義
-  - [ ] parse_service_account_key() 実装
-    - [ ] JSON keyファイルパース
-    - [ ] 必須フィールド検証
-  - [ ] AdcError型定義
-  - [ ] ユニットテスト
-    - [ ] 環境変数が設定されている場合
-    - [ ] 環境変数が未設定の場合
-    - [ ] JSONパース成功/失敗
+- [x] lib/service_account_types.mbt 作成（共通型定義）
+  - [x] ServiceAccountCredentials型定義
+  - [x] AdcError型定義
+  - [x] MetadataError型定義
+  - [x] その他エラー型定義
+
+- [x] lib/service_account_adc.mbt 作成
+  - [x] load_credentials_from_env() 実装（Phase 2対象）
+  - [x] load_credentials_from_file() 実装（Phase 2対象）
+  - [x] parse_service_account_key() 実装
+    - [x] JSON keyファイルパース
+    - [x] 必須フィールド検証
+  - [x] validate_credentials() 実装
+  - [x] ユニットテスト
+    - [x] JSONパース成功/失敗
+    - [x] 必須フィールド検証
 
 #### 3. Metadata Server認証（3-4時間）⭐ **NEW - 優先度高**
 

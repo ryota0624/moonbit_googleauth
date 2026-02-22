@@ -16,9 +16,15 @@ pub fn drive_scopes() -> Array[@oauth2.Scope]
 
 pub fn gmail_scopes() -> Array[@oauth2.Scope]
 
+pub fn load_credentials_from_env() -> Result[ServiceAccountCredentials, AdcError]
+
+pub fn load_credentials_from_file(String) -> Result[ServiceAccountCredentials, AdcError]
+
 pub fn parse_callback_url(String) -> Result[(String, String), String]
 
 pub fn parse_error_response(String) -> (String, String?)?
+
+pub fn parse_service_account_key(String) -> Result[ServiceAccountCredentials, AdcError]
 
 pub let revoke_url : String
 
@@ -64,9 +70,31 @@ pub let token_url : @oauth2.TokenUrl
 
 pub let userinfo_url : String
 
+pub fn validate_credentials(ServiceAccountCredentials) -> Result[Unit, AdcError]
+
 // Errors
 
 // Types and methods
+pub enum AdcError {
+  EnvironmentVariableNotSet
+  FileNotFound(String)
+  InvalidJson(String)
+  MissingField(String)
+  IoCCError(String)
+}
+
+pub enum AuthCredentialsType {
+  ServiceAccount
+  MetadataServer
+  ClientCredentials
+}
+
+pub enum ClientCredentialsError {
+  InvalidCredentials(String)
+  TokenExchangeFailed(String)
+  NetworkError(String)
+}
+
 pub struct GoogleOAuth2Client {
   client_id : @oauth2.ClientId
   client_secret : @oauth2.ClientSecret
@@ -75,6 +103,27 @@ pub struct GoogleOAuth2Client {
 }
 pub fn GoogleOAuth2Client::build_auth_url(Self, Array[@oauth2.Scope], @oauth2.CsrfToken) -> Result[(String, @oauth2.PkceCodeVerifier), String]
 pub fn GoogleOAuth2Client::new(String, String, String) -> Self
+
+pub enum MetadataError {
+  MetadataServerUnavailable
+  InvalidResponse(String)
+  HttpError(Int, String)
+  Timeout
+  ParsingError(String)
+}
+
+pub struct ServiceAccountCredentials {
+  type_ : String
+  project_id : String
+  private_key_id : String
+  private_key : String
+  client_email : String
+  client_id : String
+  auth_uri : String
+  token_uri : String
+  auth_provider_x509_cert_url : String?
+  client_x509_cert_url : String?
+}
 
 // Type aliases
 
