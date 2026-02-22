@@ -32,23 +32,24 @@ google API用の認証情報を取得するための実装
 ### Phase 1: Google OAuth2 ラッパー実装（推定: 1-2日）
 
 #### Google定数定義（2-3時間）
-- [ ] lib/google_constants.mbt 作成
-  - [ ] Google認証エンドポイント定義
-  - [ ] 一般的なスコープ定数定義（Drive, Gmail, Calendar等）
-  - [ ] ユニットテスト
+- [x] lib/google_constants.mbt 作成
+  - [x] Google認証エンドポイント定義
+  - [x] 一般的なスコープ定数定義（Drive, Gmail, Calendar等）
+  - [x] ユニットテスト
 
 #### GoogleOAuth2Client ラッパー（3-4時間）
-- [ ] lib/google_client.mbt 作成
-  - [ ] GoogleOAuth2Client構造体
-  - [ ] build_auth_url() メソッド
-  - [ ] exchange_code() メソッド
-  - [ ] ユニットテスト
+- [x] lib/google_client.mbt 作成
+  - [x] GoogleOAuth2Client構造体
+  - [x] build_auth_url() メソッド
+  - [x] verify_callback() メソッド
+  - [x] ユニットテスト
 
 #### ヘルパー関数（2-3時間）
-- [ ] lib/google_helpers.mbt 作成
-  - [ ] parse_callback_url() - リダイレクトURLパース
-  - [ ] PkceStorage trait定義
-  - [ ] ユニットテスト
+- [x] lib/google_helpers.mbt 作成
+  - [x] parse_callback_url() - リダイレクトURLパース
+  - [x] parse_error_response() - エラーレスポンスパース
+  - [x] PkceStorage trait定義
+  - [x] ユニットテスト
 
 #### 統合とテスト（3-4時間）
 - [ ] examples/basic_auth/ サンプル作成
