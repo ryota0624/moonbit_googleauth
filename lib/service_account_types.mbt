@@ -73,3 +73,12 @@ pub enum AuthenticationError {
   ClientCredentialsError(String)
   InvalidCredentials(String)
 }
+
+///|
+/// Token Storage 関連エラー
+pub enum TokenStorageError {
+  StorageNotAvailable(String)
+  SerializationError(String)
+  DeserializationError(String)
+  NotFound
+}

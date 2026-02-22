@@ -147,26 +147,27 @@ google API用の認証情報を取得するための実装
 
 Future consideration in Phase 2 when RSA library stabilizes
 
-### Phase 2: 高度な機能（推定: 0.5-1日）
+### Phase 2: 高度な機能（完了）✅
 
-#### トークン管理（2-3時間）
-- [ ] lib/token_manager.mbt 作成
-  - [ ] TokenManager構造体
-  - [ ] is_expired() メソッド
-  - [ ] needs_refresh() メソッド
-  - [ ] ユニットテスト
+#### トークン管理（完了）
+- [x] lib/token_manager.mbt 作成
+  - [x] TokenManager構造体
+  - [x] is_expired() メソッド
+  - [x] needs_refresh() メソッド
+  - [x] ユニットテスト (17件追加)
 
-#### トークンストレージ（2-3時間）
-- [ ] lib/token_storage.mbt 作成
-  - [ ] TokenStorage trait
-  - [ ] FileTokenStorage実装例
-  - [ ] ユニットテスト
+#### トークンストレージ（完了）
+- [x] lib/token_storage.mbt 作成
+  - [x] TokenStorage trait（関数ベース設計）
+  - [x] InMemoryTokenStorage実装
+  - [x] FileTokenStorage スタブ実装
+  - [x] ユニットテスト (8件追加)
 
-#### 高レベルAPI（2-3時間）
-- [ ] lib/google_api_client.mbt 作成
-  - [ ] GoogleApiClient構造体
-  - [ ] 自動トークンリフレッシュ機能
-  - [ ] ユニットテスト
+#### 高レベルAPI（完了）
+- [x] lib/google_api_client.mbt 作成
+  - [x] GoogleApiClient構造体
+  - [x] 自動トークンリフレッシュ機能
+  - [x] ユニットテスト (12件追加)
 
 ### ドキュメント整備（推定: 0.5-1日）
 - [ ] README.md更新

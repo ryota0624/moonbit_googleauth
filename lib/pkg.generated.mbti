@@ -40,7 +40,17 @@ pub fn load_credentials_from_env() -> Result[ServiceAccountCredentials, AdcError
 
 pub fn load_credentials_from_file(String) -> Result[ServiceAccountCredentials, AdcError]
 
+pub fn new_api_client(GoogleAuthClient) -> GoogleApiClient
+
+pub fn new_api_client_with_token(GoogleAuthClient, TokenManager) -> GoogleApiClient
+
 pub fn new_auth_client(ServiceAccountCredentials?) -> GoogleAuthClient
+
+pub fn new_file_storage(String) -> FileTokenStorage
+
+pub fn new_in_memory_storage() -> InMemoryTokenStorage
+
+pub fn new_token_manager(String, Int, String) -> TokenManager
 
 pub fn parse_callback_url(String) -> Result[(String, String), String]
 
@@ -125,6 +135,22 @@ pub enum ClientCredentialsError {
   NetworkError(String)
 }
 
+pub struct FileTokenStorage {
+  file_path : String
+}
+pub fn FileTokenStorage::clear(Self) -> Result[Unit, TokenStorageError]
+pub fn FileTokenStorage::load(Self) -> Result[TokenManager, TokenStorageError]
+pub fn FileTokenStorage::save(Self, TokenManager) -> Result[Unit, TokenStorageError]
+
+pub struct GoogleApiClient {
+  auth_client : GoogleAuthClient
+  token_manager : TokenManager?
+}
+pub fn GoogleApiClient::authenticate(Self) -> Result[Self, AuthenticationError]
+pub fn GoogleApiClient::get_valid_token(Self, Int) -> Result[String, AuthenticationError]
+pub fn GoogleApiClient::is_authenticated(Self) -> Bool
+pub fn GoogleApiClient::refresh_token_if_needed(Self, Int) -> Result[Self, AuthenticationError]
+
 pub struct GoogleAuthClient {
   auth_type : AuthCredentialsType
   credentials : ServiceAccountCredentials?
@@ -146,6 +172,13 @@ pub struct GoogleOAuth2Client {
 }
 pub fn GoogleOAuth2Client::build_auth_url(Self, Array[@oauth2.Scope], @oauth2.CsrfToken) -> Result[(String, @oauth2.PkceCodeVerifier), String]
 pub fn GoogleOAuth2Client::new(String, String, String) -> Self
+
+pub struct InMemoryTokenStorage {
+  token : TokenManager?
+}
+pub fn InMemoryTokenStorage::clear(Self) -> Self
+pub fn InMemoryTokenStorage::load(Self) -> Result[TokenManager, TokenStorageError]
+pub fn InMemoryTokenStorage::save(Self, TokenManager) -> Self
 
 pub enum MetadataError {
   MetadataServerUnavailable
@@ -177,6 +210,24 @@ pub struct ServiceAccountCredentials {
   token_uri : String
   auth_provider_x509_cert_url : String?
   client_x509_cert_url : String?
+}
+
+pub struct TokenManager {
+  access_token : String
+  expires_in : Int
+  issued_at_offset : Int
+  token_type : String
+}
+pub fn TokenManager::get_token(Self) -> String
+pub fn TokenManager::is_expired(Self, Int) -> Bool
+pub fn TokenManager::needs_refresh(Self, Int) -> Bool
+pub fn TokenManager::remaining_seconds(Self, Int) -> Int
+
+pub enum TokenStorageError {
+  StorageNotAvailable(String)
+  SerializationError(String)
+  DeserializationError(String)
+  NotFound
 }
 
 // Type aliases
