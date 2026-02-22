@@ -128,27 +128,24 @@ google API用の認証情報を取得するための実装
     - [ ] GCE環境（Metadata Server）
     - [ ] Cloud Run環境（Metadata Server）
 
-#### 5. RSA暗号化ライブラリ調査（1時間）
-- [ ] mooncakes.ioで暗号化/RSAライブラリ検索
-- [ ] 既存ライブラリの評価
-- [ ] Service Account JWT実装可能性の判断
+#### 5. RSA暗号化ライブラリ調査（1時間）⭐ **完了**
+- [x] mooncakes.ioで暗号化/RSAライブラリ検索
+- [x] 既存ライブラリの評価
+- [x] Service Account JWT実装可能性の判断
 
-#### 6. Service Account JWT実装（条件付き: 4-6時間）
-**条件:** RSA署名ライブラリが利用可能な場合のみ実装
-**優先度:** 中（ADC/Metadataがあれば代替可能）
+**調査結果:** RSAライブラリは開発中で、本番環境での使用に不確実性がある。
+実装スキップを推奨（詳細は `docs/completed/20260222_rsa_library_investigation.md` を参照）
 
-- [ ] lib/service_account/jwt.mbt 作成
-  - [ ] JwtHeader, ServiceAccountClaims型定義
-  - [ ] JWT文字列生成
-- [ ] lib/service_account/signer.mbt 作成
-  - [ ] Rs256Signer実装（または既存ライブラリ統合）
-- [ ] lib/service_account/auth.mbt 作成
-  - [ ] ServiceAccountAuth構造体
-  - [ ] get_access_token() メソッド
-- [ ] 統合テスト
-- [ ] ドキュメント
+#### 6. Service Account JWT実装（条件付き: 4-6時間）⚠️ **スキップ**
+**理由:** RSA署名ライブラリが開発中のため、条件を満たしていない
+**優先度:** 低（ADC/Metadataがあれば代替可能）
 
-**注:** ADCとMetadata Serverがあれば、Service Account JWT実装がなくても本番環境で動作可能
+**スキップ理由:**
+- ADCとMetadata Serverで本番環境での認証が完全にカバー可能
+- RSAライブラリの成熟度が不足している
+- Phase 2以降での改善を待つことが適切
+
+Future consideration in Phase 2 when RSA library stabilizes
 
 ### Phase 2: 高度な機能（推定: 0.5-1日）
 
