@@ -186,3 +186,95 @@ Future consideration in Phase 2 when RSA library stabilizes
 - [ ] email_verified等のクレーム検証
 
 注: ryota0624/oauth2に既に基本実装があるため、必要に応じて拡張
+
+## 残存するTODO（Phase 2以降で実装予定）
+
+### google_auth_client.mbt
+- [ ] **Step 1: 明示的な認証情報チェック**（現在: Phase 2以降で実装予定）
+  - Location: Line 52-53
+  - 目的: 構成ファイルやパラメータから直接認証情報を取得するオプション
+  - 優先度: 低（ADCとMetadata Serverでカバー可能）
+
+- [ ] **実際のトークン取得実装**（現在: ダミー返却 InvalidCredentials）
+  - Location: Line 104-109
+  - 目的: ServiceAccount認証情報を使用した実トークン取得
+  - 依存: RSA署名ライブラリ（開発中の為スキップ）
+  - 優先度: 中（Phase 2.5で検討）
+
+### google_client_credentials.mbt
+- [ ] **Client Credentials Flow トークン取得実装**（現在: ダミー返却）
+  - Location: Line 59
+  - 目的: OAuth2 Client Credentials Flow でのトークン取得
+  - 実装内容:
+    - `get_token_from_client_credentials()`: トークン取得ロジック
+    - `get_scoped_token_from_client_credentials()`: スコープ付きトークン取得
+  - 依存: HTTP クライアント、JSON パース
+  - 優先度: 高（Phase 2.5対象）
+
+### service_account_adc.mbt
+- [ ] **環境変数からの認証情報読み込み**（現在: NotSet エラー返却）
+  - Location: Line 20-26
+  - 機能: `load_credentials_from_env()` - GOOGLE_APPLICATION_CREDENTIALS 環境変数対応
+  - 依存: 環境変数アクセス機能
+  - 優先度: 高（実運用必須）
+
+- [ ] **ファイルからの認証情報読み込み**（現在: IoCCError 返却）
+  - Location: Line 38-44
+  - 機能: `load_credentials_from_file()` - JSONファイルの読み込みと解析
+  - 依存: ファイルI/O機能
+  - 優先度: 高（実運用必須）
+
+- [ ] **JSON パース詳細化**（現在: モック実装）
+  - Location: Line 94 コメント参照
+  - 目的: JSON.parse() を使用した完全パース
+  - 含まれるフィール:
+    - type, project_id, private_key_id, private_key
+    - client_email, client_id, auth_uri, token_uri
+    - auth_provider_x509_cert_url, client_x509_cert_url
+  - 優先度: 中
+
+### service_account_metadata.mbt
+- [ ] **Metadata Server 有効性確認の実装**（現在: false 固定返却）
+  - Location: Line 60-66
+  - 機能: `is_metadata_server_available()` - タイムアウト付きチェック
+  - 実装内容:
+    - エンドポイント: http://metadata.google.internal/computeMetadata/v1/
+    - ヘッダー: Metadata-Flavor: Google
+    - タイムアウト: 1秒
+  - 依存: HTTP クライアント（タイムアウト対応）
+  - 優先度: 高（GCP環境での認証に必須）
+
+- [ ] **Metadata Server からのトークン取得実装**（現在: ダミー返却）
+  - Location: Line 77-93
+  - 機能: `get_access_token_from_metadata_server()` - 実トークン取得
+  - 実装内容:
+    - エンドポイント: http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity
+    - JSON レスポンス解析
+    - エラーハンドリング（タイムアウト、接続失敗など）
+  - 依存: HTTP クライアント、JSON パース
+  - 優先度: 高（GCP環境での認証に必須）
+
+### token_manager.mbt
+- [ ] **システム時刻の統合**（現在: オフセットベース）
+  - Location: Line 13-14 issued_at_offset
+  - 計画: Phase 3 で `issued_at_unix_timestamp` に置き換え
+  - 影響範囲: is_expired(), needs_refresh(), remaining_seconds()
+  - 優先度: 中（Phase 3確定）
+
+### token_storage.mbt
+- [ ] **FileTokenStorage 実装**（現在: スタブ）
+  - Location: Line 67-96
+  - 機能: ファイルベースのトークン永続化
+  - 実装内容:
+    - TokenManager の JSON シリアライゼーション
+    - ファイル書込・読込
+    - 暗号化検討（オプション）
+  - 依存: ファイルI/O、JSON パース
+  - 優先度: 高（実運用向け）
+
+### google_api_client.mbt
+- [ ] **レスポンスメタデータからの expires_in 抽出**（現在: 固定値 3600秒）
+  - Location: Line 57-58
+  - 計画: Phase 3 でトークンレスポンスから実際の有効期限を抽出
+  - 実装: Token エンドポイントレスポンスから `expires_in` フィールド取得
+  - 優先度: 中（Phase 3確定）
