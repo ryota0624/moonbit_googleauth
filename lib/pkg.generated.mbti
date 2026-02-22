@@ -12,9 +12,17 @@ pub fn basic_scopes() -> Array[@oauth2.Scope]
 
 pub fn calendar_scopes() -> Array[@oauth2.Scope]
 
+pub fn default_metadata_server_config() -> MetadataServerConfig
+
 pub fn drive_scopes() -> Array[@oauth2.Scope]
 
+pub fn get_access_token_from_metadata_server() -> Result[String, MetadataError]
+
+pub fn get_token_from_metadata_server(MetadataServerConfig) -> Result[MetadataTokenResponse, MetadataError]
+
 pub fn gmail_scopes() -> Array[@oauth2.Scope]
+
+pub fn is_metadata_server_available() -> Bool
 
 pub fn load_credentials_from_env() -> Result[ServiceAccountCredentials, AdcError]
 
@@ -110,6 +118,17 @@ pub enum MetadataError {
   HttpError(Int, String)
   Timeout
   ParsingError(String)
+}
+
+pub struct MetadataServerConfig {
+  base_url : String
+  timeout_ms : Int
+}
+
+pub struct MetadataTokenResponse {
+  access_token : String
+  expires_in : Int
+  token_type : String
 }
 
 pub struct ServiceAccountCredentials {

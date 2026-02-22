@@ -96,17 +96,17 @@ google API用の認証情報を取得するための実装
 
 **重要:** GCE/GKE/Cloud Run環境では必須の機能
 
-- [ ] lib/service_account/metadata.mbt 作成
-  - [ ] MetadataServerConfig型定義
-  - [ ] get_token_from_metadata_server() 実装
-    - [ ] HTTPリクエスト（Metadata-Flavor: Google ヘッダー）
-    - [ ] エンドポイント: http://metadata.google.internal/computeMetadata/v1/...
-    - [ ] レスポンスパース
-  - [ ] is_metadata_server_available() 実装
-    - [ ] タイムアウト付きチェック（1秒）
-  - [ ] MetadataTokenResponse型定義
-  - [ ] MetadataError型定義
-  - [ ] ユニットテスト
+- [x] lib/service_account_metadata.mbt 作成
+  - [x] MetadataServerConfig型定義
+  - [x] get_token_from_metadata_server() 実装
+    - [x] HTTPリクエスト（Metadata-Flavor: Google ヘッダー） - Phase 2対象
+    - [x] エンドポイント: http://metadata.google.internal/computeMetadata/v1/...
+    - [x] レスポンスパース - Phase 2対象
+  - [x] is_metadata_server_available() 実装
+    - [x] タイムアウト付きチェック（1秒）
+  - [x] MetadataTokenResponse型定義
+  - [x] MetadataError型定義
+  - [x] ユニットテスト
   - [ ] 統合テスト（Cloud Run/GCE環境）
 
 #### 4. 自動認証検出（3-5時間）⭐ **NEW - 優先度高**

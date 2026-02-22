@@ -18,6 +18,13 @@ pub struct ServiceAccountCredentials {
 }
 
 ///|
+/// Metadata Server 設定
+pub struct MetadataServerConfig {
+  pub base_url : String
+  pub timeout_ms : Int
+}
+
+///|
 /// エラー型定義
 ///
 
