@@ -63,3 +63,13 @@ pub enum AuthCredentialsType {
   MetadataServer
   ClientCredentials
 }
+
+///|
+/// 統合認証エラー型
+pub enum AuthenticationError {
+  NoValidCredentials
+  AdcError(String)
+  MetadataServerError(String)
+  ClientCredentialsError(String)
+  InvalidCredentials(String)
+}

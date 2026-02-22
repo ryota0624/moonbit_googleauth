@@ -113,16 +113,16 @@ google API用の認証情報を取得するための実装
 
 **重要:** 環境に応じて自動的に最適な認証方法を選択
 
-- [ ] lib/google_auth_client.mbt 作成
-  - [ ] GoogleAuthClient型定義
-  - [ ] AuthCredentials enum定義
-  - [ ] auto_detect_and_authenticate() 実装
-    - [ ] Step 1: 明示的な認証情報チェック
-    - [ ] Step 2: ADC (環境変数) チェック
-    - [ ] Step 3: Metadata Server チェック
-    - [ ] Step 4: エラー（すべて失敗）
-  - [ ] get_access_token() 実装
-  - [ ] ユニットテスト
+- [x] lib/google_auth_client.mbt 作成
+  - [x] GoogleAuthClient型定義
+  - [x] AuthCredentialsType enum定義（既存）
+  - [x] auto_detect_and_authenticate() 実装
+    - [x] Step 1: 明示的な認証情報チェック（Phase 2対象）
+    - [x] Step 2: ADC (環境変数) チェック
+    - [x] Step 3: Metadata Server チェック
+    - [x] Step 4: エラー（すべて失敗）
+  - [x] get_access_token() 実装
+  - [x] ユニットテスト
   - [ ] E2Eテスト（複数環境）
     - [ ] ローカル環境（ADC）
     - [ ] GCE環境（Metadata Server）

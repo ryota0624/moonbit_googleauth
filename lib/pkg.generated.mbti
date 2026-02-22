@@ -8,6 +8,8 @@ import {
 // Values
 pub let auth_url : @oauth2.AuthUrl
 
+pub fn auto_detect_and_authenticate() -> Result[GoogleAuthClient, AuthenticationError]
+
 pub fn basic_scopes() -> Array[@oauth2.Scope]
 
 pub fn calendar_scopes() -> Array[@oauth2.Scope]
@@ -15,6 +17,8 @@ pub fn calendar_scopes() -> Array[@oauth2.Scope]
 pub fn default_metadata_server_config() -> MetadataServerConfig
 
 pub fn drive_scopes() -> Array[@oauth2.Scope]
+
+pub fn get_access_token(GoogleAuthClient) -> Result[String, AuthenticationError]
 
 pub fn get_access_token_from_metadata_server() -> Result[String, MetadataError]
 
@@ -27,6 +31,8 @@ pub fn is_metadata_server_available() -> Bool
 pub fn load_credentials_from_env() -> Result[ServiceAccountCredentials, AdcError]
 
 pub fn load_credentials_from_file(String) -> Result[ServiceAccountCredentials, AdcError]
+
+pub fn new_auth_client(ServiceAccountCredentials?) -> GoogleAuthClient
 
 pub fn parse_callback_url(String) -> Result[(String, String), String]
 
@@ -97,10 +103,23 @@ pub enum AuthCredentialsType {
   ClientCredentials
 }
 
+pub enum AuthenticationError {
+  NoValidCredentials
+  AdcError(String)
+  MetadataServerError(String)
+  ClientCredentialsError(String)
+  InvalidCredentials(String)
+}
+
 pub enum ClientCredentialsError {
   InvalidCredentials(String)
   TokenExchangeFailed(String)
   NetworkError(String)
+}
+
+pub struct GoogleAuthClient {
+  auth_type : AuthCredentialsType
+  credentials : ServiceAccountCredentials?
 }
 
 pub struct GoogleOAuth2Client {
