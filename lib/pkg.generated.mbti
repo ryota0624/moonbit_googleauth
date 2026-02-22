@@ -1,0 +1,82 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "ryota0624/googleauth/lib"
+
+import {
+  "ryota0624/oauth2",
+}
+
+// Values
+pub let auth_url : @oauth2.AuthUrl
+
+pub fn basic_scopes() -> Array[@oauth2.Scope]
+
+pub fn calendar_scopes() -> Array[@oauth2.Scope]
+
+pub fn drive_scopes() -> Array[@oauth2.Scope]
+
+pub fn gmail_scopes() -> Array[@oauth2.Scope]
+
+pub fn parse_callback_url(String) -> Result[(String, String), String]
+
+pub fn parse_error_response(String) -> (String, String?)?
+
+pub let revoke_url : String
+
+pub let scope_calendar : @oauth2.Scope
+
+pub let scope_calendar_readonly : @oauth2.Scope
+
+pub let scope_contacts : @oauth2.Scope
+
+pub let scope_contacts_readonly : @oauth2.Scope
+
+pub let scope_documents : @oauth2.Scope
+
+pub let scope_documents_readonly : @oauth2.Scope
+
+pub let scope_drive : @oauth2.Scope
+
+pub let scope_drive_metadata_readonly : @oauth2.Scope
+
+pub let scope_drive_readonly : @oauth2.Scope
+
+pub let scope_gmail_modify : @oauth2.Scope
+
+pub let scope_gmail_readonly : @oauth2.Scope
+
+pub let scope_gmail_send : @oauth2.Scope
+
+pub let scope_openid : @oauth2.Scope
+
+pub let scope_spreadsheets : @oauth2.Scope
+
+pub let scope_spreadsheets_readonly : @oauth2.Scope
+
+pub let scope_userinfo_email : @oauth2.Scope
+
+pub let scope_userinfo_profile : @oauth2.Scope
+
+pub let scope_youtube_readonly : @oauth2.Scope
+
+pub let scope_youtube_upload : @oauth2.Scope
+
+pub let token_url : @oauth2.TokenUrl
+
+pub let userinfo_url : String
+
+// Errors
+
+// Types and methods
+pub struct GoogleOAuth2Client {
+  client_id : @oauth2.ClientId
+  client_secret : @oauth2.ClientSecret
+  redirect_url : @oauth2.RedirectUrl
+  pkce_verifier : @oauth2.PkceCodeVerifier
+}
+pub fn GoogleOAuth2Client::build_auth_url(Self, Array[@oauth2.Scope], @oauth2.CsrfToken) -> Result[(String, @oauth2.PkceCodeVerifier), String]
+pub fn GoogleOAuth2Client::new(String, String, String) -> Self
+
+// Type aliases
+
+// Traits
+
