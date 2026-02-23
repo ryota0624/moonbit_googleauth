@@ -119,3 +119,127 @@ test "needs_refresh buffer is exactly 300 seconds" {
   // 299 seconds remaining: should need refresh
   assert_true(manager.needs_refresh(701))
 }
+
+///|
+/// Unix Timestamp Support Tests (Phase 4)
+test "new_token_manager_with_timestamp creates instance with Unix timestamp" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  assert_eq(manager.access_token, "test-token")
+  assert_eq(manager.expires_in, 3600)
+  assert_eq(manager.token_type, "Bearer")
+  assert_true(manager.get_issued_at_timestamp() is Some(_))
+}
+
+///|
+test "get_issued_at_timestamp returns stored Unix timestamp" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  assert_true(manager.get_issued_at_timestamp() is Some(1640000000))
+}
+
+///|
+test "get_issued_at_timestamp returns None for offset-based tokens" {
+  let manager = new_token_manager("test-token", 3600, "Bearer")
+  assert_true(manager.get_issued_at_timestamp() is None)
+}
+
+///|
+test "get_expiry_timestamp calculates expiry time correctly" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  match manager.get_expiry_timestamp() {
+    Some(ts) => assert_eq(ts, 1640003600)
+    None => assert_true(false)
+  }
+}
+
+///|
+test "get_expiry_timestamp returns None for offset-based tokens" {
+  let manager = new_token_manager("test-token", 3600, "Bearer")
+  assert_true(manager.get_expiry_timestamp() is None)
+}
+
+///|
+test "is_expired_at_timestamp returns false when token is valid" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  // Token issued at 1640000000, expires at 1640003600, checking at 1640001000 -> valid
+  assert_false(manager.is_expired_at_timestamp(1640001000))
+}
+
+///|
+test "is_expired_at_timestamp returns true when token has expired" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  // Token issued at 1640000000, expires at 1640003600, checking at 1640004000 -> expired
+  assert_true(manager.is_expired_at_timestamp(1640004000))
+}
+
+///|
+test "is_expired_at_timestamp returns true at exact expiry time" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  // Token issued at 1640000000, expires at 1640003600
+  assert_true(manager.is_expired_at_timestamp(1640003600))
+}
+
+///|
+test "is_expired_at_timestamp returns false for offset-based tokens (conservative)" {
+  let manager = new_token_manager("test-token", 3600, "Bearer")
+  // Offset-based tokens without timestamp info are conservatively treated as not expired
+  assert_false(manager.is_expired_at_timestamp(2000000000))
+}
+
+///|
+test "needs_refresh_at_timestamp returns true within 5 minutes of expiry" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  // Token issued at 1640000000, expires at 1640003600
+  // At 1640003400, 200 seconds remaining -> should refresh
+  assert_true(manager.needs_refresh_at_timestamp(1640003400))
+}
+
+///|
+test "needs_refresh_at_timestamp returns false with plenty of time" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  // Token issued at 1640000000, expires at 1640003600
+  // At 1640001000, 2600 seconds remaining -> should not refresh
+  assert_false(manager.needs_refresh_at_timestamp(1640001000))
+}
+
+///|
+test "remaining_seconds_at_timestamp calculates correctly" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  // Token issued at 1640000000, expires at 1640003600
+  // At 1640001000, remaining = 2600
+  assert_eq(manager.remaining_seconds_at_timestamp(1640001000), 2600)
+}
+
+///|
+test "remaining_seconds_at_timestamp returns negative when expired" {
+  let manager = new_token_manager_with_timestamp(
+    "test-token", 3600, 1640000000, "Bearer",
+  )
+  // Token issued at 1640000000, expires at 1640003600
+  // At 1640004000, remaining = -400
+  assert_eq(manager.remaining_seconds_at_timestamp(1640004000), -400)
+}
+
+///|
+test "remaining_seconds_at_timestamp returns conservative value for offset tokens" {
+  let manager = new_token_manager("test-token", 3600, "Bearer")
+  // Offset-based tokens without timestamp info return large positive value
+  assert_true(manager.remaining_seconds_at_timestamp(2000000000) > 1000000000)
+}

@@ -138,7 +138,13 @@ pub fn FileTokenStorage::load(
     _ =>
       return Err(TokenStorageError::DeserializationError("Missing token_type"))
   }
-  Ok({ access_token, expires_in, issued_at_offset, token_type })
+  Ok({
+    access_token,
+    expires_in,
+    issued_at_offset,
+    token_type,
+    issued_at_timestamp: None,
+  })
 }
 
 ///|
