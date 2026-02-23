@@ -16,6 +16,29 @@ pub struct TokenManager {
 }
 
 ///|
+/// Token Endpoint Response (Phase 4)
+///
+/// Represents a response from Google's token endpoint containing
+/// access token and optional metadata like expiry time.
+pub struct TokenResponse {
+  access_token : String
+  expires_in : Int // Token lifetime in seconds
+  token_type : String // Typically "Bearer"
+  scope : String? // Granted scopes (optional)
+}
+
+///|
+/// Create a TokenResponse (for testing and response parsing)
+pub fn new_token_response(
+  access_token : String,
+  expires_in : Int,
+  token_type : String,
+  scope : String?,
+) -> TokenResponse {
+  { access_token, expires_in, token_type, scope }
+}
+
+///|
 /// Create a new TokenManager instance (offset-based, backward compatible)
 pub fn new_token_manager(
   access_token : String,
@@ -154,5 +177,27 @@ pub fn TokenManager::get_expiry_timestamp(self : TokenManager) -> Int? {
   match self.issued_at_timestamp {
     Some(ts) => Some(ts + self.expires_in)
     None => None
+  }
+}
+
+///|
+/// Create TokenManager from TokenResponse with provided timestamp (Phase 4)
+///
+/// Utility function to create a TokenManager with actual expires_in from token response.
+/// This enables using real expiry times from the token endpoint instead of default values.
+///
+/// Parameters:
+/// - `response`: TokenResponse from token endpoint
+/// - `issued_at_timestamp`: Unix timestamp when token was issued
+pub fn new_token_manager_from_response(
+  response : TokenResponse,
+  issued_at_timestamp : Int,
+) -> TokenManager {
+  {
+    access_token: response.access_token,
+    expires_in: response.expires_in,
+    issued_at_offset: 0,
+    token_type: response.token_type,
+    issued_at_timestamp: Some(issued_at_timestamp),
   }
 }

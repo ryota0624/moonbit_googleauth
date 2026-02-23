@@ -243,3 +243,78 @@ test "remaining_seconds_at_timestamp returns conservative value for offset token
   // Offset-based tokens without timestamp info return large positive value
   assert_true(manager.remaining_seconds_at_timestamp(2000000000) > 1000000000)
 }
+
+///|
+/// Response Metadata Tests (Phase 4)
+test "new_token_manager_from_response creates manager with response metadata" {
+  let response = new_token_response(
+    "response-token",
+    7200,
+    "Bearer",
+    Some("read write"),
+  )
+  let manager = new_token_manager_from_response(response, 1640000000)
+  assert_eq(manager.access_token, "response-token")
+  assert_eq(manager.expires_in, 7200)
+  assert_eq(manager.token_type, "Bearer")
+  assert_true(manager.get_issued_at_timestamp() is Some(1640000000))
+}
+
+///|
+test "new_token_manager_from_response uses actual expires_in from response" {
+  let response_short = new_token_response("token1", 600, "Bearer", None)
+  let response_long = new_token_response("token2", 86400, "Bearer", None)
+  let manager_short = new_token_manager_from_response(
+    response_short, 1640000000,
+  )
+  let manager_long = new_token_manager_from_response(response_long, 1640000000)
+
+  // Both should be valid at the same current time
+  assert_false(manager_short.is_expired_at_timestamp(1640000500))
+  assert_false(manager_long.is_expired_at_timestamp(1640000500))
+
+  // Short token should expire sooner
+  assert_true(manager_short.is_expired_at_timestamp(1640000700))
+  assert_false(manager_long.is_expired_at_timestamp(1640000700))
+}
+
+///|
+test "new_token_manager_from_response handles variable scope metadata" {
+  let response_with_scope = new_token_response(
+    "token",
+    3600,
+    "Bearer",
+    Some("https://www.googleapis.com/auth/drive"),
+  )
+  let response_no_scope = new_token_response("token", 3600, "Bearer", None)
+  // Both should create valid managers regardless of scope
+  let m1 = new_token_manager_from_response(response_with_scope, 1640000000)
+  let m2 = new_token_manager_from_response(response_no_scope, 1640000000)
+  assert_eq(m1.expires_in, 3600)
+  assert_eq(m2.expires_in, 3600)
+}
+
+///|
+test "response metadata extraction enables accurate token lifecycle tracking" {
+  // Simulate getting 10-minute token from endpoint
+  let response = new_token_response(
+    "short-lived-token",
+    600,
+    "Bearer",
+    Some("openid email profile"),
+  )
+  let timestamp = 1640000000
+  let manager = new_token_manager_from_response(response, timestamp)
+
+  // At exactly 5 minutes (300 seconds) remaining: should not need refresh
+  let five_min_later = timestamp + 300
+  assert_false(manager.needs_refresh_at_timestamp(five_min_later))
+
+  // Just after 5 minutes (299 seconds remaining): should need refresh
+  let just_after_five_min = timestamp + 301
+  assert_true(manager.needs_refresh_at_timestamp(just_after_five_min))
+
+  // After 10 minutes, should be expired
+  let ten_min_later = timestamp + 600
+  assert_true(manager.is_expired_at_timestamp(ten_min_later))
+}
