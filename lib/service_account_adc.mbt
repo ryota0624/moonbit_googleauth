@@ -15,15 +15,14 @@
 /// - 成功: ServiceAccountCredentials
 /// - 失敗: AdcError
 ///
-/// Note: Phase 3で実装予定。現在はスタブ実装。
-/// 実装には以下が必要:
-/// - 環境変数アクセスライブラリの統合
-pub fn load_credentials_from_env() -> Result[
+pub async fn load_credentials_from_env() -> Result[
   ServiceAccountCredentials,
   AdcError,
 ] {
-  // TODO: Phase 3で環境変数アクセス実装時に修正
-  Err(EnvironmentVariableNotSet)
+  match @sys.get_env_var("GOOGLE_APPLICATION_CREDENTIALS") {
+    None => Err(EnvironmentVariableNotSet)
+    Some(path) => load_credentials_from_file(path)
+  }
 }
 
 ///|
@@ -36,17 +35,16 @@ pub fn load_credentials_from_env() -> Result[
 /// - 成功: ServiceAccountCredentials
 /// - 失敗: AdcError
 ///
-/// Note: Phase 3で実装予定。現在はスタブ実装。
-/// 実装には以下が必要:
-/// - ファイルI/Oライブラリの統合
-/// - 非同期処理への対応（またはブロッキング呼び出し）
-pub fn load_credentials_from_file(
+pub async fn load_credentials_from_file(
   file_path : String,
 ) -> Result[ServiceAccountCredentials, AdcError] {
-  // TODO: Phase 3でファイルI/O実装時に修正
-  // 現在: JSONの直接指定版 (parse_service_account_key) の使用を推奨
-  let _ = file_path
-  Err(IoCCError("File I/O not yet implemented"))
+  let data = @fs.read_file(file_path) catch {
+    @fs.IOError(msg) => return Err(IoCCError(msg))
+  }
+  let json_str = data.text() catch {
+    err => return Err(IoCCError(err.to_string()))
+  }
+  parse_service_account_key(json_str)
 }
 
 ///|

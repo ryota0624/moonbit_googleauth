@@ -58,7 +58,7 @@ pub fn is_metadata_server_available() -> Bool {
 /// - 成功: MetadataTokenResponse
 /// - 失敗: MetadataError
 pub fn get_token_from_metadata_server(
-  config : MetadataServerConfig,
+  _config : MetadataServerConfig,
 ) -> Result[MetadataTokenResponse, MetadataError] {
   // Phase 1.5では簡略実装
   // 実装では以下の処理を行う：

@@ -8,7 +8,7 @@ import {
 // Values
 pub let auth_url : @oauth2.AuthUrl
 
-pub fn auto_detect_and_authenticate() -> Result[GoogleAuthClient, AuthenticationError]
+pub async fn auto_detect_and_authenticate() -> Result[GoogleAuthClient, AuthenticationError]
 
 pub fn basic_scopes() -> Array[@oauth2.Scope]
 
@@ -20,7 +20,7 @@ pub fn drive_scopes() -> Array[@oauth2.Scope]
 
 pub fn from_service_account_credentials(ServiceAccountCredentials) -> GoogleClientCredentials
 
-pub fn get_access_token(GoogleAuthClient) -> Result[String, AuthenticationError]
+pub async fn get_access_token(GoogleAuthClient) -> Result[String, AuthenticationError]
 
 pub fn get_access_token_from_metadata_server() -> Result[String, MetadataError]
 
@@ -36,9 +36,9 @@ pub fn is_credentials_valid(GoogleClientCredentials) -> Bool
 
 pub fn is_metadata_server_available() -> Bool
 
-pub fn load_credentials_from_env() -> Result[ServiceAccountCredentials, AdcError]
+pub async fn load_credentials_from_env() -> Result[ServiceAccountCredentials, AdcError]
 
-pub fn load_credentials_from_file(String) -> Result[ServiceAccountCredentials, AdcError]
+pub async fn load_credentials_from_file(String) -> Result[ServiceAccountCredentials, AdcError]
 
 pub fn new_api_client(GoogleAuthClient) -> GoogleApiClient
 
@@ -138,18 +138,18 @@ pub enum ClientCredentialsError {
 pub struct FileTokenStorage {
   file_path : String
 }
-pub fn FileTokenStorage::clear(Self) -> Result[Unit, TokenStorageError]
-pub fn FileTokenStorage::load(Self) -> Result[TokenManager, TokenStorageError]
-pub fn FileTokenStorage::save(Self, TokenManager) -> Result[Unit, TokenStorageError]
+pub async fn FileTokenStorage::clear(Self) -> Result[Unit, TokenStorageError]
+pub async fn FileTokenStorage::load(Self) -> Result[TokenManager, TokenStorageError]
+pub async fn FileTokenStorage::save(Self, TokenManager) -> Result[Unit, TokenStorageError]
 
 pub struct GoogleApiClient {
   auth_client : GoogleAuthClient
   token_manager : TokenManager?
 }
-pub fn GoogleApiClient::authenticate(Self) -> Result[Self, AuthenticationError]
+pub async fn GoogleApiClient::authenticate(Self) -> Result[Self, AuthenticationError]
 pub fn GoogleApiClient::get_valid_token(Self, Int) -> Result[String, AuthenticationError]
 pub fn GoogleApiClient::is_authenticated(Self) -> Bool
-pub fn GoogleApiClient::refresh_token_if_needed(Self, Int) -> Result[Self, AuthenticationError]
+pub async fn GoogleApiClient::refresh_token_if_needed(Self, Int) -> Result[Self, AuthenticationError]
 
 pub struct GoogleAuthClient {
   auth_type : AuthCredentialsType

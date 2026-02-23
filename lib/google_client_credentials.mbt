@@ -10,11 +10,11 @@
 ///
 /// Service Account認証用の設定を保持します。
 pub struct GoogleClientCredentials {
-  pub service_account_email : String
-  pub project_id : String
-  pub client_id : String
-  pub token_uri : String
-  pub private_key : String
+  service_account_email : String
+  project_id : String
+  client_id : String
+  token_uri : String
+  private_key : String
 }
 
 ///|

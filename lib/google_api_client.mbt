@@ -46,7 +46,7 @@ pub fn GoogleApiClient::is_authenticated(self : GoogleApiClient) -> Bool {
 /// Returns:
 /// - Ok(GoogleApiClient): Updated client with token
 /// - Err(AuthenticationError): If token retrieval fails
-pub fn GoogleApiClient::authenticate(
+pub async fn GoogleApiClient::authenticate(
   self : GoogleApiClient,
 ) -> Result[GoogleApiClient, AuthenticationError] {
   match get_access_token(self.auth_client) {
@@ -93,7 +93,7 @@ pub fn GoogleApiClient::get_valid_token(
 /// Returns:
 /// - Ok(GoogleApiClient): Updated client (may be same if refresh not needed)
 /// - Err(AuthenticationError): If refresh fails
-pub fn GoogleApiClient::refresh_token_if_needed(
+pub async fn GoogleApiClient::refresh_token_if_needed(
   self : GoogleApiClient,
   current_time_offset : Int,
 ) -> Result[GoogleApiClient, AuthenticationError] {

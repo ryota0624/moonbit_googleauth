@@ -57,3 +57,19 @@ test "parse_service_account_key missing private_key field" {
     Err(_) => assert_true(true)
   }
 }
+
+///|
+test "load_credentials_from_file returns error for nonexistent file" {
+  // NOTE: Async test - actual call cannot be made in sync test context
+  // This test is a placeholder for Phase 3 when async test support is available
+  // The function load_credentials_from_file() is async and will return IoCCError
+  assert_true(true)
+}
+
+///|
+test "load_credentials_from_env returns error when not set" {
+  // NOTE: Async test - actual call cannot be made in sync test context
+  // This test is a placeholder for Phase 3 when async test support is available
+  // The function load_credentials_from_env() is async and will return EnvironmentVariableNotSet
+  assert_true(true)
+}

@@ -8,10 +8,10 @@
 ///|
 /// Token manager for tracking access token validity and expiry
 pub struct TokenManager {
-  pub access_token : String
-  pub expires_in : Int
-  pub issued_at_offset : Int
-  pub token_type : String
+  access_token : String
+  expires_in : Int
+  issued_at_offset : Int
+  token_type : String
 }
 
 ///|

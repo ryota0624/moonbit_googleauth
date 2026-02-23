@@ -20,8 +20,8 @@ pub struct ServiceAccountCredentials {
 ///|
 /// Metadata Server 設定
 pub struct MetadataServerConfig {
-  pub base_url : String
-  pub timeout_ms : Int
+  base_url : String
+  timeout_ms : Int
 }
 
 ///|
