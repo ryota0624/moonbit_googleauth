@@ -15,7 +15,7 @@
 /// - 成功: ServiceAccountCredentials
 /// - 失敗: AdcError
 ///
-pub async fn load_credentials_from_env() -> Result[
+pub fn load_credentials_from_env() -> Result[
   ServiceAccountCredentials,
   AdcError,
 ] {
@@ -35,7 +35,7 @@ pub async fn load_credentials_from_env() -> Result[
 /// - 成功: ServiceAccountCredentials
 /// - 失敗: AdcError
 ///
-pub async fn load_credentials_from_file(
+pub fn load_credentials_from_file(
   file_path : String,
 ) -> Result[ServiceAccountCredentials, AdcError] {
   let data = @fs.read_file(file_path) catch {

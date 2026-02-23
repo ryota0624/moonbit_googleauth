@@ -45,7 +45,7 @@ pub fn new_auth_client(
 /// Returns:
 /// - 成功: GoogleAuthClient
 /// - 失敗: AuthenticationError
-pub async fn auto_detect_and_authenticate() -> Result[
+pub fn auto_detect_and_authenticate() -> Result[
   GoogleAuthClient,
   AuthenticationError,
 ] {
@@ -94,7 +94,7 @@ pub async fn auto_detect_and_authenticate() -> Result[
 /// Returns:
 /// - 成功: アクセストークン文字列
 /// - 失敗: AuthenticationError
-pub async fn get_access_token(
+pub fn get_access_token(
   client : GoogleAuthClient,
 ) -> Result[String, AuthenticationError] {
   match client.auth_type {
