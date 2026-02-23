@@ -146,10 +146,10 @@ pub struct GoogleApiClient {
   auth_client : GoogleAuthClient
   token_manager : TokenManager?
 }
-pub async fn GoogleApiClient::authenticate(Self) -> Result[Self, AuthenticationError]
+pub fn GoogleApiClient::authenticate(Self) -> Result[Self, AuthenticationError]
 pub fn GoogleApiClient::get_valid_token(Self, Int) -> Result[String, AuthenticationError]
 pub fn GoogleApiClient::is_authenticated(Self) -> Bool
-pub async fn GoogleApiClient::refresh_token_if_needed(Self, Int) -> Result[Self, AuthenticationError]
+pub fn GoogleApiClient::refresh_token_if_needed(Self, Int) -> Result[Self, AuthenticationError]
 
 pub struct GoogleAuthClient {
   auth_type : AuthCredentialsType

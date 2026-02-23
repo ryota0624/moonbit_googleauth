@@ -122,12 +122,12 @@ pub fn FileTokenStorage::load(
       )
   }
   let expires_in = match obj.get("expires_in") {
-    Some(Number(n)) => n.to_int()
+    Some(Number(n, ..)) => n.to_int()
     _ =>
       return Err(TokenStorageError::DeserializationError("Missing expires_in"))
   }
   let issued_at_offset = match obj.get("issued_at_offset") {
-    Some(Number(n)) => n.to_int()
+    Some(Number(n, ..)) => n.to_int()
     _ =>
       return Err(
         TokenStorageError::DeserializationError("Missing issued_at_offset"),
