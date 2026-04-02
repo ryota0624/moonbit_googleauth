@@ -42,3 +42,19 @@ test "new_auth_client returns google auth client" {
   // Verify the client was created successfully
   assert_true(client.credentials is None)
 }
+
+///|
+test "new_auth_client_from_authorized_user creates client" {
+  let creds = new_authorized_user_credentials(
+    "authorized_user", "xxx.apps.googleusercontent.com", "xxx-secret", "1//xxx-refresh",
+  )
+  let client = new_auth_client_from_authorized_user(creds)
+  assert_true(client.credentials is None)
+  assert_true(client.authorized_user is Some(_))
+}
+
+///|
+test "new_auth_client includes authorized_user as None" {
+  let client = new_auth_client(None)
+  assert_true(client.authorized_user is None)
+}

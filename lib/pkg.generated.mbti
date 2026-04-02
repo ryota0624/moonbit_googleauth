@@ -8,7 +8,7 @@ import {
 // Values
 pub let auth_url : @oauth2.AuthUrl
 
-pub fn auto_detect_and_authenticate() -> Result[GoogleAuthClient, AuthenticationError]
+pub async fn auto_detect_and_authenticate() -> Result[GoogleAuthClient, AuthenticationError]
 
 pub fn basic_scopes() -> Array[@oauth2.Scope]
 
@@ -16,7 +16,11 @@ pub fn calendar_scopes() -> Array[@oauth2.Scope]
 
 pub fn default_metadata_server_config() -> MetadataServerConfig
 
+pub fn detect_credential_type(String) -> Result[String, AdcError]
+
 pub fn drive_scopes() -> Array[@oauth2.Scope]
+
+pub async fn exchange_refresh_token(AuthorizedUserCredentials) -> Result[String, AdcError]
 
 pub fn from_service_account_credentials(ServiceAccountCredentials) -> GoogleClientCredentials
 
@@ -30,15 +34,21 @@ pub fn get_token_from_client_credentials(GoogleClientCredentials) -> Result[Stri
 
 pub fn get_token_from_metadata_server(MetadataServerConfig) -> Result[MetadataTokenResponse, MetadataError]
 
+pub fn get_well_known_credentials_path() -> String?
+
 pub fn gmail_scopes() -> Array[@oauth2.Scope]
 
 pub fn is_credentials_valid(GoogleClientCredentials) -> Bool
 
 pub fn is_metadata_server_available() -> Bool
 
-pub fn load_credentials_from_env() -> Result[ServiceAccountCredentials, AdcError]
+pub async fn load_and_detect_credentials_from_file(String) -> Result[(String, String), AdcError]
 
-pub fn load_credentials_from_file(String) -> Result[ServiceAccountCredentials, AdcError]
+pub async fn load_credentials_from_env() -> Result[ServiceAccountCredentials, AdcError]
+
+pub async fn load_credentials_from_file(String) -> Result[ServiceAccountCredentials, AdcError]
+
+pub async fn load_json_from_well_known_location() -> Result[(String, String), AdcError]
 
 pub fn new_api_client(GoogleAuthClient) -> GoogleApiClient
 
@@ -46,11 +56,23 @@ pub fn new_api_client_with_token(GoogleAuthClient, TokenManager) -> GoogleApiCli
 
 pub fn new_auth_client(ServiceAccountCredentials?) -> GoogleAuthClient
 
+pub fn new_auth_client_from_authorized_user(AuthorizedUserCredentials) -> GoogleAuthClient
+
+pub fn new_authorized_user_credentials(String, String, String, String) -> AuthorizedUserCredentials
+
 pub fn new_file_storage(String) -> FileTokenStorage
 
 pub fn new_in_memory_storage() -> InMemoryTokenStorage
 
 pub fn new_token_manager(String, Int, String) -> TokenManager
+
+pub fn new_token_manager_from_response(TokenResponse, Int) -> TokenManager
+
+pub fn new_token_manager_with_timestamp(String, Int, Int, String) -> TokenManager
+
+pub fn new_token_response(String, Int, String, String?) -> TokenResponse
+
+pub fn parse_authorized_user_key(String) -> Result[AuthorizedUserCredentials, AdcError]
 
 pub fn parse_callback_url(String) -> Result[(String, String), String]
 
@@ -102,6 +124,8 @@ pub let token_url : @oauth2.TokenUrl
 
 pub let userinfo_url : String
 
+pub fn validate_authorized_user_credentials(AuthorizedUserCredentials) -> Result[Unit, AdcError]
+
 pub fn validate_credentials(ServiceAccountCredentials) -> Result[Unit, AdcError]
 
 // Errors
@@ -113,10 +137,13 @@ pub enum AdcError {
   InvalidJson(String)
   MissingField(String)
   IoCCError(String)
-}
+  UnsupportedCredentialType(String)
+  WellKnownLocationNotFound
+} derive(Show)
 
 pub enum AuthCredentialsType {
   ServiceAccount
+  AuthorizedUser
   MetadataServer
   ClientCredentials
 }
@@ -129,6 +156,13 @@ pub enum AuthenticationError {
   InvalidCredentials(String)
 }
 
+pub struct AuthorizedUserCredentials {
+  type_ : String
+  client_id : String
+  client_secret : String
+  refresh_token : String
+}
+
 pub enum ClientCredentialsError {
   InvalidCredentials(String)
   TokenExchangeFailed(String)
@@ -138,9 +172,9 @@ pub enum ClientCredentialsError {
 pub struct FileTokenStorage {
   file_path : String
 }
-pub fn FileTokenStorage::clear(Self) -> Result[Unit, TokenStorageError]
-pub fn FileTokenStorage::load(Self) -> Result[TokenManager, TokenStorageError]
-pub fn FileTokenStorage::save(Self, TokenManager) -> Result[Unit, TokenStorageError]
+pub async fn FileTokenStorage::clear(Self) -> Result[Unit, TokenStorageError]
+pub async fn FileTokenStorage::load(Self) -> Result[TokenManager, TokenStorageError]
+pub async fn FileTokenStorage::save(Self, TokenManager) -> Result[Unit, TokenStorageError]
 
 pub struct GoogleApiClient {
   auth_client : GoogleAuthClient
@@ -154,6 +188,7 @@ pub fn GoogleApiClient::refresh_token_if_needed(Self, Int) -> Result[Self, Authe
 pub struct GoogleAuthClient {
   auth_type : AuthCredentialsType
   credentials : ServiceAccountCredentials?
+  authorized_user : AuthorizedUserCredentials?
 }
 
 pub struct GoogleClientCredentials {
@@ -217,11 +252,24 @@ pub struct TokenManager {
   expires_in : Int
   issued_at_offset : Int
   token_type : String
+  issued_at_timestamp : Int?
 }
+pub fn TokenManager::get_expiry_timestamp(Self) -> Int?
+pub fn TokenManager::get_issued_at_timestamp(Self) -> Int?
 pub fn TokenManager::get_token(Self) -> String
 pub fn TokenManager::is_expired(Self, Int) -> Bool
+pub fn TokenManager::is_expired_at_timestamp(Self, Int) -> Bool
 pub fn TokenManager::needs_refresh(Self, Int) -> Bool
+pub fn TokenManager::needs_refresh_at_timestamp(Self, Int) -> Bool
 pub fn TokenManager::remaining_seconds(Self, Int) -> Int
+pub fn TokenManager::remaining_seconds_at_timestamp(Self, Int) -> Int
+
+pub struct TokenResponse {
+  access_token : String
+  expires_in : Int
+  token_type : String
+  scope : String?
+}
 
 pub enum TokenStorageError {
   StorageNotAvailable(String)

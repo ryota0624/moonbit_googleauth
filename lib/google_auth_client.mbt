@@ -11,6 +11,7 @@
 pub struct GoogleAuthClient {
   auth_type : AuthCredentialsType
   credentials : ServiceAccountCredentials?
+  authorized_user : AuthorizedUserCredentials?
 }
 
 ///|
@@ -30,6 +31,25 @@ pub fn new_auth_client(
       None => MetadataServer
     },
     credentials,
+    authorized_user: None,
+  }
+}
+
+///|
+/// AuthorizedUser認証情報からGoogleAuthClientを作成
+///
+/// Parameters:
+/// - `credentials`: AuthorizedUserCredentials
+///
+/// Returns:
+/// - GoogleAuthClient
+pub fn new_auth_client_from_authorized_user(
+  credentials : AuthorizedUserCredentials,
+) -> GoogleAuthClient {
+  {
+    auth_type: AuthorizedUser,
+    credentials: None,
+    authorized_user: Some(credentials),
   }
 }
 
@@ -45,38 +65,91 @@ pub fn new_auth_client(
 /// Returns:
 /// - 成功: GoogleAuthClient
 /// - 失敗: AuthenticationError
-pub fn auto_detect_and_authenticate() -> Result[
+pub async fn auto_detect_and_authenticate() -> Result[
   GoogleAuthClient,
   AuthenticationError,
 ] {
-  // Step 1: 明示的な認証情報チェック
-  // Phase 2以降で実装予定
-
-  // Step 2: ADC (環境変数) チェック
-  match load_credentials_from_env() {
-    Ok(creds) =>
-      // 認証情報の妥当性を確認
-      match validate_credentials(creds) {
-        Ok(_) =>
-          return Ok(GoogleAuthClient::{
-            auth_type: ServiceAccount,
-            credentials: Some(creds),
-          })
-        Err(err) => {
-          // ADC invalid, continue to next method
-          let _ = err
-        }
+  // Step 1: GOOGLE_APPLICATION_CREDENTIALS 環境変数チェック
+  // service_account と authorized_user の両方に対応
+  match @sys.get_env_var("GOOGLE_APPLICATION_CREDENTIALS") {
+    Some(path) =>
+      match load_and_detect_credentials_from_file(path) {
+        Ok(("service_account", json_str)) =>
+          match parse_service_account_key(json_str) {
+            Ok(creds) =>
+              match validate_credentials(creds) {
+                Ok(_) =>
+                  return Ok(GoogleAuthClient::{
+                    auth_type: ServiceAccount,
+                    credentials: Some(creds),
+                    authorized_user: None,
+                  })
+                Err(_) => ()
+              }
+            Err(_) => ()
+          }
+        Ok(("authorized_user", json_str)) =>
+          match parse_authorized_user_key(json_str) {
+            Ok(creds) =>
+              match validate_authorized_user_credentials(creds) {
+                Ok(_) =>
+                  return Ok(GoogleAuthClient::{
+                    auth_type: AuthorizedUser,
+                    credentials: None,
+                    authorized_user: Some(creds),
+                  })
+                Err(_) => ()
+              }
+            Err(_) => ()
+          }
+        Ok(_) => ()
+        Err(_) => ()
       }
-    Err(_err) => {
-      // ADC not available, continue to next method
-      let _ = _err
-    }
+    None => ()
+  }
+
+  // Step 2: Well-known location チェック
+  // ~/.config/gcloud/application_default_credentials.json
+  match load_json_from_well_known_location() {
+    Ok(("authorized_user", json_str)) =>
+      match parse_authorized_user_key(json_str) {
+        Ok(creds) =>
+          match validate_authorized_user_credentials(creds) {
+            Ok(_) =>
+              return Ok(GoogleAuthClient::{
+                auth_type: AuthorizedUser,
+                credentials: None,
+                authorized_user: Some(creds),
+              })
+            Err(_) => ()
+          }
+        Err(_) => ()
+      }
+    Ok(("service_account", json_str)) =>
+      match parse_service_account_key(json_str) {
+        Ok(creds) =>
+          match validate_credentials(creds) {
+            Ok(_) =>
+              return Ok(GoogleAuthClient::{
+                auth_type: ServiceAccount,
+                credentials: Some(creds),
+                authorized_user: None,
+              })
+            Err(_) => ()
+          }
+        Err(_) => ()
+      }
+    Ok(_) => ()
+    Err(_) => ()
   }
 
   // Step 3: Metadata Server チェック
-  // Metadata Server の存在確認
   if is_metadata_server_available() {
-    return Ok(GoogleAuthClient::{ auth_type: MetadataServer, credentials: None })
+    return Ok(GoogleAuthClient::{
+      auth_type: MetadataServer,
+      credentials: None,
+      authorized_user: None,
+    })
   }
 
   // Step 4: エラー（すべて失敗）
@@ -126,6 +199,17 @@ pub fn get_access_token(
           }
           Err(MetadataServerError(err_msg))
         }
+      }
+    AuthorizedUser =>
+      match client.authorized_user {
+        Some(_creds) =>
+          Err(
+            InvalidCredentials(
+              "AuthorizedUser token refresh not implemented yet",
+            ),
+          )
+        None =>
+          Err(InvalidCredentials("No authorized_user credentials available"))
       }
     ClientCredentials =>
       Err(InvalidCredentials("Client Credentials not yet implemented"))

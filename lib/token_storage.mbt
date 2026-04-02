@@ -66,7 +66,7 @@ pub fn new_file_storage(file_path : String) -> FileTokenStorage {
 /// Save token to file storage
 ///
 /// Persists token information as JSON to the specified file path.
-pub fn FileTokenStorage::save(
+pub async fn FileTokenStorage::save(
   self : FileTokenStorage,
   token : TokenManager,
 ) -> Result[Unit, TokenStorageError] {
@@ -91,7 +91,7 @@ pub fn FileTokenStorage::save(
 /// Load token from file storage
 ///
 /// Reads and parses JSON from the file to reconstruct TokenManager.
-pub fn FileTokenStorage::load(
+pub async fn FileTokenStorage::load(
   self : FileTokenStorage,
 ) -> Result[TokenManager, TokenStorageError] {
   let data = @fs.read_file(self.file_path) catch {
@@ -151,7 +151,7 @@ pub fn FileTokenStorage::load(
 /// Clear token from file storage
 ///
 /// Removes the token by clearing or deleting the file.
-pub fn FileTokenStorage::clear(
+pub async fn FileTokenStorage::clear(
   self : FileTokenStorage,
 ) -> Result[Unit, TokenStorageError] {
   if @fs.exists(self.file_path) {

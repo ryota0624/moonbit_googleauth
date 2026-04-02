@@ -18,6 +18,15 @@ pub struct ServiceAccountCredentials {
 }
 
 ///|
+/// gcloud auth application-default login で生成される認証情報
+pub struct AuthorizedUserCredentials {
+  type_ : String
+  client_id : String
+  client_secret : String
+  refresh_token : String
+}
+
+///|
 /// Metadata Server 設定
 pub struct MetadataServerConfig {
   base_url : String
@@ -36,7 +45,9 @@ pub enum AdcError {
   InvalidJson(String)
   MissingField(String)
   IoCCError(String)
-}
+  UnsupportedCredentialType(String)
+  WellKnownLocationNotFound
+} derive(Show)
 
 ///|
 /// Metadata Server 関連エラー
@@ -60,6 +71,7 @@ pub enum ClientCredentialsError {
 /// 認証タイプ
 pub enum AuthCredentialsType {
   ServiceAccount
+  AuthorizedUser
   MetadataServer
   ClientCredentials
 }

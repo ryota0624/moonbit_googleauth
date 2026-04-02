@@ -29,7 +29,8 @@ Add to your `moon.mod.json`:
 
 ### OAuth2 Authorization Code Flow
 
-```moonbit
+```moonbit nocheck
+///|
 pub fn main() {
   // Create OAuth2 client with PKCE support
   let client = GoogleOAuth2Client::{
@@ -56,19 +57,19 @@ pub fn main() {
 
 ### Service Account Authentication (ADC)
 
-```moonbit
+```moonbit nocheck
+///|
 async fn main() {
   // Automatically detect authentication method (ADC → Metadata Server)
   match auto_detect_and_authenticate() {
     Ok(auth_client) => {
       let api_client = new_api_client(auth_client)
       match api_client.refresh_token_if_needed(0) {
-        Ok(client) => {
+        Ok(client) =>
           match client.get_valid_token(0) {
             Ok(token) => println("Token: " + token)
             Err(_) => println("Failed to get token")
           }
-        }
         Err(_) => println("Failed to authenticate")
       }
     }
@@ -93,7 +94,7 @@ Auto-detection order:
 
 ## Supported Scopes
 
-```moonbit
+```moonbit nocheck
 basic_scopes()    // openid, email, profile
 drive_scopes()    // Google Drive
 gmail_scopes()    // Gmail

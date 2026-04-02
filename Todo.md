@@ -169,15 +169,15 @@ Future consideration in Phase 2 when RSA library stabilizes
   - [x] 自動トークンリフレッシュ機能
   - [x] ユニットテスト (12件追加)
 
-### ドキュメント整備（推定: 0.5-1日）
-- [ ] README.md更新
-  - [ ] プロジェクト概要
-  - [ ] インストール方法
-  - [ ] クイックスタート
-  - [ ] 基本的な使用例
-- [ ] docs/quickstart.md作成
-- [ ] docs/api_reference.md作成
-- [ ] docs/google_setup.md作成（Google Console設定手順）
+### ドキュメント整備（推定: 0.5-1日）✅ **完了（Phase 4）**
+- [x] README.md更新
+  - [x] プロジェクト概要
+  - [x] インストール方法
+  - [x] クイックスタート
+  - [x] 基本的な使用例
+- [x] docs/quickstart.md作成
+- [x] docs/api_reference.md作成
+- [x] docs/google_setup.md作成（Google Console設定手順）
 - [ ] examples/の充実
 
 ### Phase 3（オプション）: OpenID Connect完全対応（1-2日）
@@ -219,11 +219,12 @@ Future consideration in Phase 2 when RSA library stabilizes
   - 優先度: 高（実運用必須・Phase 3）
   - ステータス: スタブ完成（ログイン: 20260222）
 
-- [ ] **ファイルからの認証情報読み込み**（現在: IoCCError 返却）
+- [x] **ファイルからの認証情報読み込み**✅ **完了（Phase 3）**
   - Location: Line 38-44
   - 機能: `load_credentials_from_file()` - JSONファイルの読み込みと解析
-  - 依存: ファイルI/O機能（非同期）
-  - 優先度: 高（実運用必須・Phase 3）
+  - 実装: @fs.read_file() を使用した非同期ファイルI/O、.text() で String 変換
+  - 依存: ファイルI/O機能（非同期） ✅ mizchi/x fs 統合済み
+  - 優先度: 高（実運用必須・Phase 3で完了）
 
 - [x] **JSON パース詳細化**（完了: @json.parse() 実装）
   - Location: Line 61
@@ -257,11 +258,13 @@ Future consideration in Phase 2 when RSA library stabilizes
   - 優先度: 高（GCP環境での認証に必須）
 
 ### token_manager.mbt
-- [ ] **システム時刻の統合**（現在: オフセットベース）
-  - Location: Line 13-14 issued_at_offset
-  - 計画: Phase 3 で `issued_at_unix_timestamp` に置き換え
-  - 影響範囲: is_expired(), needs_refresh(), remaining_seconds()
-  - 優先度: 中（Phase 3確定）
+- [x] **システム時刻の統合**✅ **完了（Phase 4）**
+  - Location: Line 13-14 issued_at_timestamp
+  - 実装: `issued_at_timestamp: Int?` フィールド追加
+  - メソッド: 6 個の新メソッド追加（is_expired_at_timestamp, needs_refresh_at_timestamp, remaining_seconds_at_timestamp 等）
+  - テスト: 14 個追加
+  - 影響範囲: is_expired(), needs_refresh(), remaining_seconds() は後方互換性を維持
+  - 優先度: 中（Phase 4で実装完了）
 
 ### token_storage.mbt
 - [ ] **FileTokenStorage 実装**（現在: スタブ）
@@ -276,8 +279,12 @@ Future consideration in Phase 2 when RSA library stabilizes
   - ステータス: スタブ状態維持（非同期ファイルI/O待ち）
 
 ### google_api_client.mbt
-- [ ] **レスポンスメタデータからの expires_in 抽出**（現在: 固定値 3600秒）
-  - Location: Line 57-58
-  - 計画: Phase 3 でトークンレスポンスから実際の有効期限を抽出
-  - 実装: Token エンドポイントレスポンスから `expires_in` フィールド取得
-  - 優先度: 中（Phase 3確定）
+- [x] **レスポンスメタデータからの expires_in 抽出インフラ**✅ **完了（Phase 4）**
+  - Location: token_manager.mbt に実装
+  - 実装内容:
+    - TokenResponse 構造体定義（access_token, expires_in, token_type, scope）
+    - new_token_response() ファクトリ関数
+    - new_token_manager_from_response() コンバーター関数
+  - テスト: 4 個追加
+  - 計画: Phase 5 で HTTP クライアント統合後に実際のレスポンス使用
+  - 優先度: 中（Phase 4でインフラ完成、Phase 5で統合）

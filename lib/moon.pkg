@@ -2,6 +2,7 @@ import {
   "ryota0624/oauth2",
   "mizchi/x/fs",
   "mizchi/x/sys",
+  "mizchi/x/http",
   "moonbitlang/core/json",
   "moonbitlang/core/test",
 }

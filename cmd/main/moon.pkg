@@ -1,7 +1,14 @@
-// import {
-//   "ryota0624/googleauth" @lib,
-// }
+import {
+  "ryota0624/googleauth/lib",
+  "mizchi/x/http",
+  "moonbitlang/async",
+  "moonbitlang/core/json",
+}
 
 options(
   "is-main": true,
+  targets: {
+    "main.mbt": [ "native", "js" ],
+    "main_wasm.mbt": [ "wasm", "wasm-gc" ],
+  },
 )
