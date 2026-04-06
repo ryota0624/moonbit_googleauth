@@ -1,3 +1,5 @@
+warnings = "-0029-0067"
+
 import {
   "ryota0624/googleauth/lib",
   "mizchi/x/http",

@@ -1,3 +1,5 @@
+warnings = "-0067"
+
 import {
   "ryota0624/oauth2",
   "mizchi/x/fs",
