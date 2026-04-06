@@ -41,11 +41,9 @@ pub struct MetadataServerConfig {
 /// Application Default Credentials (ADC) 関連エラー
 pub enum AdcError {
   EnvironmentVariableNotSet
-  FileNotFound(String)
   InvalidJson(String)
   MissingField(String)
   IoCCError(String)
-  UnsupportedCredentialType(String)
   WellKnownLocationNotFound
 } derive(Show)
 
@@ -53,18 +51,12 @@ pub enum AdcError {
 /// Metadata Server 関連エラー
 pub enum MetadataError {
   MetadataServerUnavailable
-  InvalidResponse(String)
-  HttpError(Int, String)
-  Timeout
-  ParsingError(String)
 }
 
 ///|
 /// Client Credentials 関連エラー
 pub enum ClientCredentialsError {
-  InvalidCredentials(String)
   TokenExchangeFailed(String)
-  NetworkError(String)
 }
 
 ///|
@@ -73,16 +65,13 @@ pub enum AuthCredentialsType {
   ServiceAccount
   AuthorizedUser
   MetadataServer
-  ClientCredentials
 }
 
 ///|
 /// 統合認証エラー型
 pub enum AuthenticationError {
   NoValidCredentials
-  AdcError(String)
   MetadataServerError(String)
-  ClientCredentialsError(String)
   InvalidCredentials(String)
 }
 
@@ -90,7 +79,6 @@ pub enum AuthenticationError {
 /// Token Storage 関連エラー
 pub enum TokenStorageError {
   StorageNotAvailable(String)
-  SerializationError(String)
   DeserializationError(String)
   NotFound
 }

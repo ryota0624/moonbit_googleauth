@@ -188,14 +188,8 @@ pub fn get_access_token(
       match get_access_token_from_metadata_server() {
         Ok(token) => Ok(token)
         Err(err) => {
-          // Metadata Server error
           let err_msg = match err {
             MetadataServerUnavailable => "Metadata server unavailable"
-            InvalidResponse(msg) => "Invalid response: " + msg
-            HttpError(code, msg) =>
-              "HTTP error: " + code.to_string() + " " + msg
-            Timeout => "Metadata server timeout"
-            ParsingError(msg) => "Parsing error: " + msg
           }
           Err(MetadataServerError(err_msg))
         }
@@ -211,7 +205,5 @@ pub fn get_access_token(
         None =>
           Err(InvalidCredentials("No authorized_user credentials available"))
       }
-    ClientCredentials =>
-      Err(InvalidCredentials("Client Credentials not yet implemented"))
   }
 }

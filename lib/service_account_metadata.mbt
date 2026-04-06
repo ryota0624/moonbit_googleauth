@@ -15,6 +15,16 @@ pub struct MetadataTokenResponse {
 ///
 
 ///|
+/// MetadataTokenResponseのコンストラクタ
+pub fn new_metadata_token_response(
+  access_token : String,
+  expires_in : Int,
+  token_type : String,
+) -> MetadataTokenResponse {
+  MetadataTokenResponse::{ access_token, expires_in, token_type }
+}
+
+///|
 /// デフォルトのMetadata Server設定を取得
 pub fn default_metadata_server_config() -> MetadataServerConfig {
   {

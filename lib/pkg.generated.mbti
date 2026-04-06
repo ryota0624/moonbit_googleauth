@@ -64,6 +64,8 @@ pub fn new_file_storage(String) -> FileTokenStorage
 
 pub fn new_in_memory_storage() -> InMemoryTokenStorage
 
+pub fn new_metadata_token_response(String, Int, String) -> MetadataTokenResponse
+
 pub fn new_token_manager(String, Int, String) -> TokenManager
 
 pub fn new_token_manager_from_response(TokenResponse, Int) -> TokenManager
@@ -133,11 +135,9 @@ pub fn validate_credentials(ServiceAccountCredentials) -> Result[Unit, AdcError]
 // Types and methods
 pub enum AdcError {
   EnvironmentVariableNotSet
-  FileNotFound(String)
   InvalidJson(String)
   MissingField(String)
   IoCCError(String)
-  UnsupportedCredentialType(String)
   WellKnownLocationNotFound
 } derive(Show)
 
@@ -145,14 +145,11 @@ pub enum AuthCredentialsType {
   ServiceAccount
   AuthorizedUser
   MetadataServer
-  ClientCredentials
 }
 
 pub enum AuthenticationError {
   NoValidCredentials
-  AdcError(String)
   MetadataServerError(String)
-  ClientCredentialsError(String)
   InvalidCredentials(String)
 }
 
@@ -164,9 +161,7 @@ pub struct AuthorizedUserCredentials {
 }
 
 pub enum ClientCredentialsError {
-  InvalidCredentials(String)
   TokenExchangeFailed(String)
-  NetworkError(String)
 }
 
 pub struct FileTokenStorage {
@@ -217,10 +212,6 @@ pub fn InMemoryTokenStorage::save(Self, TokenManager) -> Self
 
 pub enum MetadataError {
   MetadataServerUnavailable
-  InvalidResponse(String)
-  HttpError(Int, String)
-  Timeout
-  ParsingError(String)
 }
 
 pub struct MetadataServerConfig {
@@ -273,7 +264,6 @@ pub struct TokenResponse {
 
 pub enum TokenStorageError {
   StorageNotAvailable(String)
-  SerializationError(String)
   DeserializationError(String)
   NotFound
 }

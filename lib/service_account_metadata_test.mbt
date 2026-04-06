@@ -22,7 +22,6 @@ test "get_access_token_from_metadata_server returns error in non-GCP environment
   match get_access_token_from_metadata_server() {
     Ok(_) => assert_false(true)
     Err(MetadataError::MetadataServerUnavailable) => assert_true(true)
-    Err(_) => assert_false(true)
   }
 }
 
@@ -32,18 +31,14 @@ test "get_token_from_metadata_server with default config returns error" {
   match get_token_from_metadata_server(config) {
     Ok(_) => assert_false(true)
     Err(MetadataError::MetadataServerUnavailable) => assert_true(true)
-    Err(_) => assert_false(true)
   }
 }
 
 ///|
 test "get_token_from_metadata_server with custom timeout" {
   let config = default_metadata_server_config()
-  // Note: Custom timeout test would require creating a new config
-  // Phase 2 will implement full custom config support
   match get_token_from_metadata_server(config) {
     Ok(_) => assert_false(true)
     Err(MetadataError::MetadataServerUnavailable) => assert_true(true)
-    Err(_) => assert_false(true)
   }
 }
