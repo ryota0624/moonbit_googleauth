@@ -1,5 +1,3 @@
-warnings = "-0067"
-
 import {
   "ryota0624/oauth2",
   "mizchi/x/fs",
@@ -8,3 +6,5 @@ import {
   "moonbitlang/core/json",
   "moonbitlang/core/test",
 }
+
+warnings = "-0067"

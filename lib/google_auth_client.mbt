@@ -167,7 +167,7 @@ pub async fn auto_detect_and_authenticate() -> Result[
 /// Returns:
 /// - 成功: アクセストークン文字列
 /// - 失敗: AuthenticationError
-pub fn get_access_token(
+pub async fn get_access_token(
   client : GoogleAuthClient,
 ) -> Result[String, AuthenticationError] {
   match client.auth_type {
@@ -196,12 +196,11 @@ pub fn get_access_token(
       }
     AuthorizedUser =>
       match client.authorized_user {
-        Some(_creds) =>
-          Err(
-            InvalidCredentials(
-              "AuthorizedUser token refresh not implemented yet",
-            ),
-          )
+        Some(creds) =>
+          match exchange_refresh_token(creds) {
+            Ok(token) => Ok(token)
+            Err(err) => Err(InvalidCredentials("\{err}"))
+          }
         None =>
           Err(InvalidCredentials("No authorized_user credentials available"))
       }
