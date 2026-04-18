@@ -6,3 +6,5 @@ import {
   "moonbitlang/core/json",
   "moonbitlang/core/test",
 }
+
+warnings = "-0067"

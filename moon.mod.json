@@ -1,6 +1,7 @@
 {
   "name": "ryota0624/googleauth",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "preferred-target": "native",
   "deps": {
     "ryota0624/oauth2": "0.1.2",
     "mizchi/x": "0.1.3",

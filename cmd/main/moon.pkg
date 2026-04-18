@@ -5,6 +5,8 @@ import {
   "moonbitlang/core/json",
 }
 
+warnings = "-0029-0067"
+
 options(
   "is-main": true,
   targets: {
